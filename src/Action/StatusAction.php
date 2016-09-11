@@ -20,24 +20,15 @@ class StatusAction implements ActionInterface
 
         $details = ArrayObject::ensureArrayObject($request->getModel());
 
-        if (isset($details['uid']) === false) {
-            $request->markNew();
-
-            return;
-        }
-
-        if (isset($details['uid']) === true) {
-            $request->markPending();
-
-            return;
-        }
-
         if (isset($details['prc']) === true) {
+
             /*
              * 290 交易成功，但資訊不符  交易成功，但資訊不符(包含金額、已逾期...等)
              */
             if (in_array($details['prc'], ['250', '600', '290'], true) === true) {
                 $request->markCaptured();
+
+                return;
             }
 
             /*
@@ -45,13 +36,23 @@ class StatusAction implements ActionInterface
              */
             if (in_array($details['prc'], ['260', '270', '280', 'A0002'], true) === true) {
                 $request->markPending();
+
+                return;
             }
 
             if ($details['prc'] === '380') {
                 $request->markExpired();
+
+                return;
             }
 
             $request->markFailed();
+
+            return;
+        }
+
+        if (isset($details['uid']) === false) {
+            $request->markNew();
 
             return;
         }
