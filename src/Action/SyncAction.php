@@ -35,7 +35,6 @@ class SyncAction implements ActionInterface, ApiAwareInterface, GatewayAwareInte
 
         $result = $this->api->queryOrder($details->toUnsafeArray());
         $result = $this->api->parseResult($result);
-
         $details->replace($result);
     }
 
