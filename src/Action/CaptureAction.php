@@ -15,6 +15,7 @@ use Payum\Core\Security\GenericTokenFactoryAwareInterface;
 use Payum\Core\Security\GenericTokenFactoryAwareTrait;
 use PayumTW\Mypay\Api;
 use Payum\Core\Reply\HttpRedirect;
+use Payum\Core\Request\Sync;
 
 class CaptureAction implements ActionInterface, ApiAwareInterface, GatewayAwareInterface, GenericTokenFactoryAwareInterface
 {
@@ -42,37 +43,33 @@ class CaptureAction implements ActionInterface, ApiAwareInterface, GatewayAwareI
     public function execute($request)
     {
         RequestNotSupportedException::assertSupports($this, $request);
-        $model = ArrayObject::ensureArrayObject($request->getModel());
+        $details = ArrayObject::ensureArrayObject($request->getModel());
+
+        if (isset($details['uid']) === true) {
+            $this->gateway->execute(new Sync($details));
+
+            return;
+        }
 
         $token = $request->getToken();
-        $afterUrl = $token->getAfterUrl();
-
-        if (empty($model['success_returl']) === true) {
-            $model['success_returl'] = $afterUrl;
+        $targetUrl = $token->getTargetUrl();
+        if (empty($details['success_returl']) === true) {
+            $details['success_returl'] = $targetUrl;
         }
 
-        if (empty($model['failure_returl']) === true) {
-            $model['failure_returl'] = $afterUrl;
+        if (empty($details['failure_returl']) === true) {
+            $details['failure_returl'] = $targetUrl;
         }
-
-        // $targetUrl = $token->getTargetUrl();
-        // if (empty($model['success_returl']) === true) {
-        //     $model['success_returl'] = $targetUrl;
-        // }
-        //
-        // if (empty($model['failure_returl']) === true) {
-        //     $model['failure_returl'] = $targetUrl;
-        // }
 
         $notifyToken = $this->tokenFactory->createNotifyToken(
             $token->getGatewayName(),
             $token->getDetails()
         );
 
-        $model['echo_0'] = $notifyToken->getHash();
+        $details[Api::NOTIFY_TOKEN_FIELD] = $notifyToken->getHash();
 
-        $result = $this->api->call($model->toUnsafeArray(), 'api/orders');
-        $model->replace((array) $result);
+        $result = $this->api->createOrder($details->toUnsafeArray(), 'api/orders');
+        $details->replace((array) $result);
 
         throw new HttpRedirect($result['url']);
     }

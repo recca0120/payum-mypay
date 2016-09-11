@@ -18,30 +18,36 @@ class StatusAction implements ActionInterface
     {
         RequestNotSupportedException::assertSupports($this, $request);
 
-        $model = ArrayObject::ensureArrayObject($request->getModel());
+        $details = ArrayObject::ensureArrayObject($request->getModel());
 
-        if (isset($model['prc']) === false) {
+        if (isset($details['uid']) === false) {
             $request->markNew();
 
             return;
         }
 
-        if (isset($model['prc']) === true) {
+        if (isset($details['uid']) === true) {
+            $request->markPending();
+
+            return;
+        }
+
+        if (isset($details['prc']) === true) {
             /*
              * 290 交易成功，但資訊不符  交易成功，但資訊不符(包含金額、已逾期...等)
              */
-            if (in_array($model['prc'], ['250', '600', '290'], true) === true) {
+            if (in_array($details['prc'], ['250', '600', '290'], true) === true) {
                 $request->markCaptured();
             }
 
             /*
              * 280 儲值/WEBATM­線上待付款，但需要等到使用者線上確認交易
              */
-            if (in_array($model['prc'], ['260', '270', '280', 'A0002'], true) === true) {
+            if (in_array($details['prc'], ['260', '270', '280', 'A0002'], true) === true) {
                 $request->markPending();
             }
 
-            if ($model['prc'] === '380') {
+            if ($details['prc'] === '380') {
                 $request->markExpired();
             }
 

@@ -1,6 +1,6 @@
 # Mypay
 
-[![StyleCI](https://styleci.io/repos/67210412/shield?style=flat)](https://styleci.io/repos/67210412)
+[![StyleCI](https://styleci.io/repos/67906669/shield?style=flat)](https://styleci.io/repos/67906669)
 [![Build Status](https://travis-ci.org/recca0120/payum-mypay.svg)](https://travis-ci.org/recca0120/payum-mypay)
 [![Total Downloads](https://poser.pugx.org/payum-tw/mypay/d/total.svg)](https://packagist.org/packages/payum-tw/mypay)
 [![Latest Stable Version](https://poser.pugx.org/payum-tw/mypay/v/stable.svg)](https://packagist.org/packages/payum-tw/mypay)

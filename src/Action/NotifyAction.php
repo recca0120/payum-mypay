@@ -32,14 +32,17 @@ class NotifyAction implements ActionInterface, ApiAwareInterface, GatewayAwareIn
     public function execute($request)
     {
         RequestNotSupportedException::assertSupports($this, $request);
-        $model = ArrayObject::ensureArrayObject($request->getModel());
+        $details = ArrayObject::ensureArrayObject($request->getModel());
 
         $httpRequest = new GetHttpRequest();
         $this->gateway->execute($httpRequest);
 
-        $params = $this->api->parseResult($httpRequest->request);
+        if ($details['key'] === $httpRequest->request['key']) {
+            throw new HttpResponse('key verify fail.', 400, ['Content-Type' => 'text/plain']);
+        }
 
-        $model->replace($params);
+        $params = $this->api->parseResult($httpRequest->request);
+        $details->replace($params);
 
         throw new HttpResponse('8888', 200, ['Content-Type' => 'text/plain']);
     }

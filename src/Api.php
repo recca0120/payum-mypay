@@ -7,6 +7,8 @@ use Payum\Core\HttpClientInterface;
 
 class Api
 {
+    const NOTIFY_TOKEN_FIELD = 'echo_4';
+
     // 1  CREDITCARD  信用卡
     const CREDITCARD = 'CREDITCARD';
     // 2  RECHARGE  儲值卡
@@ -61,6 +63,7 @@ class Api
         'A0001' => '中斷交易  上游提供交易服務商發生異常或網路中斷',
         'A0002' => '未完成交易  消費者未做任何消費動作時',
     ];
+
     /**
      * @param array               $options
      * @param HttpClientInterface $client
@@ -111,15 +114,15 @@ class Api
     {
         return 'https://authorize.usecase.cc/api/authorize/makeOrderEncryConnection';
     }
+
     /**
-     * call.
+     * createOrder.
      *
      * @param array $params
-     * @param mixed $cmd
      *
      * @return array
      */
-    public function call(array $params, $cmd = 'api/orders')
+    public function createOrder(array $params)
     {
         $supportedParams = [
             // 次特店商務代號  必要  必要
@@ -226,8 +229,42 @@ class Api
             array_intersect_key($params, $supportedParams)
         ));
 
+        return $this->call($params, 'api/orders');
+    }
+
+    /**
+     * queryOrder.
+     *
+     * @param array $params
+     *
+     * @return array
+     */
+    public function queryOrder($params)
+    {
+        $supportedParams = [
+            'uid' => null,
+            'key' => null,
+        ];
+
+        $params = array_filter(array_replace(
+            $supportedParams,
+            array_intersect_key($params, $supportedParams)
+        ));
+
+        return $this->call($params, 'api/queryorder');
+    }
+
+    /**
+     * call.
+     *
+     * @param array $params
+     *
+     * @return array
+     */
+    protected function call($params, $cmd)
+    {
         $postData = [
-            'store_uid' => $params['store_uid'],
+            'store_uid' => $this->options['store_uid'],
             'service' => $this->calculateHash([
                 'service_name' => 'api',
                 'cmd' => $cmd,
