@@ -3,21 +3,16 @@
 namespace PayumTW\Mypay\Action;
 
 use Payum\Core\Action\ActionInterface;
-use Payum\Core\ApiAwareInterface;
-use Payum\Core\ApiAwareTrait;
 use Payum\Core\Bridge\Spl\ArrayObject;
 use Payum\Core\Exception\RequestNotSupportedException;
-use Payum\Core\Exception\UnsupportedApiException;
 use Payum\Core\GatewayAwareInterface;
 use Payum\Core\GatewayAwareTrait;
 use Payum\Core\Request\Capture;
 use Payum\Core\Security\GenericTokenFactoryAwareInterface;
 use Payum\Core\Security\GenericTokenFactoryAwareTrait;
 use PayumTW\Mypay\Api;
-use Payum\Core\Reply\HttpRedirect;
 use Payum\Core\Request\Sync;
 use PayumTW\Mypay\Request\Api\CreateTransaction;
-use Payum\Core\Request\GetHttpRequest;
 
 class CaptureAction implements ActionInterface, GatewayAwareInterface, GenericTokenFactoryAwareInterface
 {
@@ -34,6 +29,12 @@ class CaptureAction implements ActionInterface, GatewayAwareInterface, GenericTo
         RequestNotSupportedException::assertSupports($this, $request);
         $details = ArrayObject::ensureArrayObject($request->getModel());
 
+        if (isset($details['uid']) === true) {
+            $this->gateway->execute(new Sync($details));
+
+            return;
+        }
+
         $token = $request->getToken();
 
         $targetUrl = $token->getTargetUrl();
@@ -43,15 +44,6 @@ class CaptureAction implements ActionInterface, GatewayAwareInterface, GenericTo
 
         if (empty($details['failure_returl']) === true) {
             $details['failure_returl'] = $targetUrl;
-        }
-
-        $afterUrl = $token->getAfterUrl();
-        if (empty($details['success_returl']) === true) {
-            $details['success_returl'] = $afterUrl;
-        }
-
-        if (empty($details['failure_returl']) === true) {
-            $details['failure_returl'] = $afterUrl;
         }
 
         $notifyToken = $this->tokenFactory->createNotifyToken(

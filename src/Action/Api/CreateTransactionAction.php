@@ -20,11 +20,9 @@ class CreateTransactionAction extends BaseApiAwareAction
 
         $details = ArrayObject::ensureArrayObject($request->getModel());
 
-        $result = $this->api->createTransaction((array) $details);
+        $details->replace($this->api->createTransaction((array) $details));
 
-        $details->replace($details);
-
-        throw new HttpRedirect($result['url']);
+        throw new HttpRedirect($details['url']);
     }
 
     /**

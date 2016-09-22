@@ -255,7 +255,7 @@ class Api
             ));
 
             $result = $this->call($params, 'api/queryorder');
-        } else  {
+        } else {
             $result = $params;
         }
 
@@ -311,7 +311,7 @@ class Api
      */
     public function parseResult($params)
     {
-        $params['statusReason'] = $params['retmsg'];
+        $params['statusReason'] = (isset($params['retmsg']) === true) ? $params['retmsg'] : 'unknown';
 
         return $params;
     }

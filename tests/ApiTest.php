@@ -85,7 +85,7 @@ class ApiTest extends PHPUnit_Framework_TestCase
         });
 
         $api = new Api($options, $httpClient, $message);
-        $result = $api->createOrder($params);
+        $result = $api->createTransaction($params);
     }
 
     protected function decode($data, $key)
