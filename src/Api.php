@@ -4,6 +4,8 @@ namespace PayumTW\Mypay;
 
 use Http\Message\MessageFactory;
 use Payum\Core\HttpClientInterface;
+use LogicException;
+use Payum\Core\Exception\Http\HttpException;
 
 class Api
 {
@@ -116,13 +118,13 @@ class Api
     }
 
     /**
-     * createOrder.
+     * createTransaction.
      *
      * @param array $params
      *
      * @return array
      */
-    public function createOrder(array $params)
+    public function createTransaction(array $params)
     {
         $supportedParams = [
             // 次特店商務代號  必要  必要
@@ -233,25 +235,31 @@ class Api
     }
 
     /**
-     * queryOrder.
+     * getTransactionData.
      *
-     * @param array $params
+     * @param mixed $params
      *
      * @return array
      */
-    public function queryOrder($params)
+    public function getTransactionData(array $params)
     {
-        $supportedParams = [
-            'uid' => null,
-            'key' => null,
-        ];
+        if (isset($params['uid']) === false) {
+            $supportedParams = [
+                'uid' => null,
+                'key' => null,
+            ];
 
-        $params = array_filter(array_replace(
-            $supportedParams,
-            array_intersect_key($params, $supportedParams)
-        ));
+            $params = array_filter(array_replace(
+                $supportedParams,
+                array_intersect_key($params, $supportedParams)
+            ));
 
-        return $this->call($params, 'api/queryorder');
+            $result = $this->call($params, 'api/queryorder');
+        } else  {
+            $result = $params;
+        }
+
+        return $this->parseResult($result);
     }
 
     /**

@@ -16,24 +16,13 @@ use Payum\Core\Security\GenericTokenFactoryAwareTrait;
 use PayumTW\Mypay\Api;
 use Payum\Core\Reply\HttpRedirect;
 use Payum\Core\Request\Sync;
+use PayumTW\Mypay\Request\Api\CreateTransaction;
+use Payum\Core\Request\GetHttpRequest;
 
-class CaptureAction implements ActionInterface, ApiAwareInterface, GatewayAwareInterface, GenericTokenFactoryAwareInterface
+class CaptureAction implements ActionInterface, GatewayAwareInterface, GenericTokenFactoryAwareInterface
 {
-    use ApiAwareTrait;
     use GatewayAwareTrait;
     use GenericTokenFactoryAwareTrait;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setApi($api)
-    {
-        if (false == $api instanceof Api) {
-            throw new UnsupportedApiException(sprintf('Not supported. Expected %s instance to be set as api.', Api::class));
-        }
-
-        $this->api = $api;
-    }
 
     /**
      * {@inheritdoc}
@@ -45,13 +34,8 @@ class CaptureAction implements ActionInterface, ApiAwareInterface, GatewayAwareI
         RequestNotSupportedException::assertSupports($this, $request);
         $details = ArrayObject::ensureArrayObject($request->getModel());
 
-        if (isset($details['uid']) === true) {
-            $this->gateway->execute(new Sync($details));
-
-            return;
-        }
-
         $token = $request->getToken();
+
         $targetUrl = $token->getTargetUrl();
         if (empty($details['success_returl']) === true) {
             $details['success_returl'] = $targetUrl;
@@ -61,6 +45,15 @@ class CaptureAction implements ActionInterface, ApiAwareInterface, GatewayAwareI
             $details['failure_returl'] = $targetUrl;
         }
 
+        $afterUrl = $token->getAfterUrl();
+        if (empty($details['success_returl']) === true) {
+            $details['success_returl'] = $afterUrl;
+        }
+
+        if (empty($details['failure_returl']) === true) {
+            $details['failure_returl'] = $afterUrl;
+        }
+
         $notifyToken = $this->tokenFactory->createNotifyToken(
             $token->getGatewayName(),
             $token->getDetails()
@@ -68,10 +61,7 @@ class CaptureAction implements ActionInterface, ApiAwareInterface, GatewayAwareI
 
         $details[Api::NOTIFY_TOKEN_FIELD] = $notifyToken->getHash();
 
-        $result = $this->api->createOrder($details->toUnsafeArray(), 'api/orders');
-        $details->replace((array) $result);
-
-        throw new HttpRedirect($result['url']);
+        $this->gateway->execute(new CreateTransaction($details));
     }
 
     /**

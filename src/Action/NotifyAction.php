@@ -12,17 +12,12 @@ use Payum\Core\GatewayAwareTrait;
 use Payum\Core\Reply\HttpResponse;
 use Payum\Core\Request\GetHttpRequest;
 use Payum\Core\Request\Notify;
+use Payum\Core\Request\Sync;
 use PayumTW\Mypay\Api;
 
-class NotifyAction implements ActionInterface, ApiAwareInterface, GatewayAwareInterface
+class NotifyAction implements ActionInterface, GatewayAwareInterface
 {
-    use ApiAwareTrait;
     use GatewayAwareTrait;
-
-    public function __construct()
-    {
-        $this->apiClass = Api::class;
-    }
 
     /**
      * {@inheritdoc}
@@ -37,12 +32,13 @@ class NotifyAction implements ActionInterface, ApiAwareInterface, GatewayAwareIn
         $httpRequest = new GetHttpRequest();
         $this->gateway->execute($httpRequest);
 
-        if ($details['key'] === $httpRequest->request['key']) {
-            throw new HttpResponse('key verify fail.', 400, ['Content-Type' => 'text/plain']);
-        }
+        // if ($details['key'] === $httpRequest->request['key']) {
+        //     throw new HttpResponse('key verify fail.', 400, ['Content-Type' => 'text/plain']);
+        // }
 
-        $params = $this->api->parseResult($httpRequest->request);
-        $details->replace($params);
+        $details->replace($httpRequest->request);
+
+        $this->gateway->execute(new Sync($details));
 
         throw new HttpResponse('8888', 200, ['Content-Type' => 'text/plain']);
     }

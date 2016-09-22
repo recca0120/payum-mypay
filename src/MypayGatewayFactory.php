@@ -10,6 +10,8 @@ use PayumTW\Mypay\Action\NotifyAction;
 use PayumTW\Mypay\Action\NotifyNullAction;
 use PayumTW\Mypay\Action\StatusAction;
 use PayumTW\Mypay\Action\SyncAction;
+use PayumTW\Mypay\Action\Api\CreateTransactionAction;
+use PayumTW\Mypay\Action\Api\GetTransactionDataAction;
 
 class MypayGatewayFactory extends GatewayFactory
 {
@@ -21,12 +23,18 @@ class MypayGatewayFactory extends GatewayFactory
         $config->defaults([
             'payum.factory_name' => 'mypay',
             'payum.factory_title' => 'Mypay',
+
             'payum.action.capture' => new CaptureAction(),
-            'payum.action.status' => new StatusAction(),
-            'payum.action.convert_payment' => new ConvertPaymentAction(),
             'payum.action.notify' => new NotifyAction(),
             'payum.action.notify_null' => new NotifyNullAction(),
             'payum.action.sync' => new SyncAction(),
+            'payum.action.status' => new StatusAction(),
+            'payum.action.convert_payment' => new ConvertPaymentAction(),
+
+            'payum.action.api.create_transaction' => new CreateTransactionAction(),
+            // 'payum.action.api.refund_transaction' => new RefundTransactionAction(),
+            // 'payum.action.api.cancel_transaction' => new CancelTransactionAction(),
+            'payum.action.api.get_transaction_data' => new GetTransactionDataAction(),
         ]);
 
         if (false == $config['payum.api']) {

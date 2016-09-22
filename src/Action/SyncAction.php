@@ -6,21 +6,16 @@ use Payum\Core\Bridge\Spl\ArrayObject;
 use Payum\Core\Request\Sync;
 use Payum\Core\Exception\RequestNotSupportedException;
 use PayumTW\Mypay\Api;
+use PayumTW\Mypay\Request\Api\GetTransactionData;
 use Payum\Core\ApiAwareTrait;
 use Payum\Core\GatewayAwareTrait;
 use Payum\Core\Action\ActionInterface;
 use Payum\Core\ApiAwareInterface;
 use Payum\Core\GatewayAwareInterface;
 
-class SyncAction implements ActionInterface, ApiAwareInterface, GatewayAwareInterface
+class SyncAction implements ActionInterface, GatewayAwareInterface
 {
-    use ApiAwareTrait;
     use GatewayAwareTrait;
-
-    public function __construct()
-    {
-        $this->apiClass = Api::class;
-    }
 
     /**
      * {@inheritdoc}
@@ -33,9 +28,7 @@ class SyncAction implements ActionInterface, ApiAwareInterface, GatewayAwareInte
 
         $details = ArrayObject::ensureArrayObject($request->getModel());
 
-        $result = $this->api->queryOrder($details->toUnsafeArray());
-        $result = $this->api->parseResult($result);
-        $details->replace($result);
+        $this->gateway->execute(new GetTransactionData($details));
     }
 
     /**
