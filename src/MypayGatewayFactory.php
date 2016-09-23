@@ -6,7 +6,6 @@ use Payum\Core\Bridge\Spl\ArrayObject;
 use Payum\Core\GatewayFactory;
 use PayumTW\Mypay\Action\Api\CreateTransactionAction;
 use PayumTW\Mypay\Action\Api\GetTransactionDataAction;
-use PayumTW\Mypay\Action\Api\VerifyHashAction;
 use PayumTW\Mypay\Action\CaptureAction;
 use PayumTW\Mypay\Action\ConvertPaymentAction;
 use PayumTW\Mypay\Action\NotifyAction;

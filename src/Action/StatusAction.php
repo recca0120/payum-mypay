@@ -51,13 +51,7 @@ class StatusAction implements ActionInterface
             return;
         }
 
-        if (isset($details['uid']) === false) {
-            $request->markNew();
-
-            return;
-        }
-
-        $request->markFailed();
+        $request->markNew();
     }
 
     /**

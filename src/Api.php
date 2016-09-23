@@ -244,10 +244,10 @@ class Api
     public function getTransactionData(array $params)
     {
         if (empty($params['response']) === false) {
-            $result = $params['response'];
+            $details = $params['response'];
 
-            if ($params['key'] !== $result['key']) {
-                $result['code'] = '-1';
+            if ($params['key'] !== $details['key']) {
+                $details['code'] = '-1';
             }
         } else {
             $supportedParams = [
@@ -260,10 +260,10 @@ class Api
                 array_intersect_key($params, $supportedParams)
             ));
 
-            $result = $this->call($params, 'api/queryorder');
+            $details = $this->call($params, 'api/queryorder');
         }
 
-        return $this->parseResult($result);
+        return $this->parseResult($details);
     }
 
     /**

@@ -8,10 +8,8 @@ use Payum\Core\Exception\RequestNotSupportedException;
 use Payum\Core\GatewayAwareInterface;
 use Payum\Core\GatewayAwareTrait;
 use Payum\Core\Reply\HttpResponse;
-use Payum\Core\Request\GetHttpRequest;
 use Payum\Core\Request\Notify;
 use Payum\Core\Request\Sync;
-use PayumTW\Mypay\Request\Api\VerifyHash;
 
 class NotifyAction implements ActionInterface, GatewayAwareInterface
 {

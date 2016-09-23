@@ -30,13 +30,10 @@ class SyncAction implements ActionInterface, GatewayAwareInterface
         $this->gateway->execute($httpRequest);
 
         $details->replace([
-            'response' => $httpRequest->request
+            'response' => $httpRequest->request,
         ]);
 
         $this->gateway->execute(new GetTransactionData($details));
-
-        dump($details);
-        exit;
     }
 
     /**
