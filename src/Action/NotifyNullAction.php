@@ -8,8 +8,8 @@ use Payum\Core\GatewayAwareInterface;
 use Payum\Core\GatewayAwareTrait;
 use Payum\Core\Reply\HttpResponse;
 use Payum\Core\Request\GetHttpRequest;
-use Payum\Core\Request\Notify;
 use Payum\Core\Request\GetToken;
+use Payum\Core\Request\Notify;
 use PayumTW\Mypay\Api;
 
 class NotifyNullAction implements ActionInterface, GatewayAwareInterface
@@ -27,10 +27,6 @@ class NotifyNullAction implements ActionInterface, GatewayAwareInterface
 
         $httpRequest = new GetHttpRequest();
         $this->gateway->execute($httpRequest);
-
-        if (empty($httpRequest->request[Api::NOTIFY_TOKEN_FIELD])) {
-            throw new HttpResponse('The notification is invalid.', 400);
-        }
 
         $notifyToken = $httpRequest->request[Api::NOTIFY_TOKEN_FIELD];
         $getToken = new GetToken($notifyToken);

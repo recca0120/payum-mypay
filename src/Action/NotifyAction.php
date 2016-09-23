@@ -11,6 +11,7 @@ use Payum\Core\Reply\HttpResponse;
 use Payum\Core\Request\GetHttpRequest;
 use Payum\Core\Request\Notify;
 use Payum\Core\Request\Sync;
+use PayumTW\Mypay\Request\Api\VerifyHash;
 
 class NotifyAction implements ActionInterface, GatewayAwareInterface
 {
@@ -29,9 +30,10 @@ class NotifyAction implements ActionInterface, GatewayAwareInterface
         $httpRequest = new GetHttpRequest();
         $this->gateway->execute($httpRequest);
 
-        if ($details['key'] !== $httpRequest->request['key']) {
-            throw new HttpResponse('key verify fail.', 400, ['Content-Type' => 'text/plain']);
-        }
+        $this->gateway->execute(new VerifyHash([
+            'key' => $details['key'],
+            'verify' => $httpRequest->request['key'],
+        ]));
 
         $details->replace($httpRequest->request);
 

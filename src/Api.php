@@ -3,9 +3,9 @@
 namespace PayumTW\Mypay;
 
 use Http\Message\MessageFactory;
-use Payum\Core\HttpClientInterface;
 use LogicException;
 use Payum\Core\Exception\Http\HttpException;
+use Payum\Core\HttpClientInterface;
 
 class Api
 {
@@ -243,7 +243,7 @@ class Api
      */
     public function getTransactionData(array $params)
     {
-        if (isset($params['uid']) === false) {
+        if (isset($params['uid']) === true) {
             $supportedParams = [
                 'uid' => null,
                 'key' => null,

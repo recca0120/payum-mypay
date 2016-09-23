@@ -2,10 +2,10 @@
 
 namespace PayumTW\Mypay\Action\Api;
 
-use PayumTW\Mypay\Api;
 use Payum\Core\Action\ActionInterface;
 use Payum\Core\ApiAwareInterface;
 use Payum\Core\Exception\UnsupportedApiException;
+use PayumTW\Mypay\Api;
 
 abstract class BaseApiAwareAction implements ActionInterface, ApiAwareInterface
 {

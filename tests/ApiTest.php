@@ -1,9 +1,9 @@
 <?php
 
-use Payum\Core\HttpClientInterface;
-use PayumTW\Mypay\Api;
 use Http\Message\MessageFactory;
 use Mockery as m;
+use Payum\Core\HttpClientInterface;
+use PayumTW\Mypay\Api;
 use Psr\Http\Message\RequestInterface;
 
 class ApiTest extends PHPUnit_Framework_TestCase

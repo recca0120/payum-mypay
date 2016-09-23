@@ -2,13 +2,13 @@
 
 namespace PayumTW\Mypay\Action;
 
-use Payum\Core\Bridge\Spl\ArrayObject;
-use Payum\Core\Request\Sync;
-use Payum\Core\Exception\RequestNotSupportedException;
-use PayumTW\Mypay\Request\Api\GetTransactionData;
-use Payum\Core\GatewayAwareTrait;
 use Payum\Core\Action\ActionInterface;
+use Payum\Core\Bridge\Spl\ArrayObject;
+use Payum\Core\Exception\RequestNotSupportedException;
 use Payum\Core\GatewayAwareInterface;
+use Payum\Core\GatewayAwareTrait;
+use Payum\Core\Request\Sync;
+use PayumTW\Mypay\Request\Api\GetTransactionData;
 
 class SyncAction implements ActionInterface, GatewayAwareInterface
 {
