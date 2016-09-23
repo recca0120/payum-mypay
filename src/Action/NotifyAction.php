@@ -27,17 +27,11 @@ class NotifyAction implements ActionInterface, GatewayAwareInterface
         RequestNotSupportedException::assertSupports($this, $request);
         $details = ArrayObject::ensureArrayObject($request->getModel());
 
-        $httpRequest = new GetHttpRequest();
-        $this->gateway->execute($httpRequest);
-
-        $this->gateway->execute(new VerifyHash([
-            'key' => $details['key'],
-            'verify' => $httpRequest->request['key'],
-        ]));
-
-        $details->replace($httpRequest->request);
-
         $this->gateway->execute(new Sync($details));
+
+        if ($details['code'] == '-1') {
+            throw new HttpResponse('key verify fail.', 400, ['Content-Type' => 'text/plain']);
+        }
 
         throw new HttpResponse('8888', 200, ['Content-Type' => 'text/plain']);
     }

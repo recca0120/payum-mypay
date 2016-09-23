@@ -7,6 +7,7 @@ use Payum\Core\Bridge\Spl\ArrayObject;
 use Payum\Core\Exception\RequestNotSupportedException;
 use Payum\Core\GatewayAwareInterface;
 use Payum\Core\GatewayAwareTrait;
+use Payum\Core\Request\GetHttpRequest;
 use Payum\Core\Request\Sync;
 use PayumTW\Mypay\Request\Api\GetTransactionData;
 
@@ -25,7 +26,17 @@ class SyncAction implements ActionInterface, GatewayAwareInterface
 
         $details = ArrayObject::ensureArrayObject($request->getModel());
 
+        $httpRequest = new GetHttpRequest();
+        $this->gateway->execute($httpRequest);
+
+        $details->replace([
+            'response' => $httpRequest->request
+        ]);
+
         $this->gateway->execute(new GetTransactionData($details));
+
+        dump($details);
+        exit;
     }
 
     /**

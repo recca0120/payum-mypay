@@ -243,7 +243,13 @@ class Api
      */
     public function getTransactionData(array $params)
     {
-        if (isset($params['uid']) === true) {
+        if (empty($params['response']) === false) {
+            $result = $params['response'];
+
+            if ($params['key'] !== $result['key']) {
+                $result['code'] = '-1';
+            }
+        } else {
             $supportedParams = [
                 'uid' => null,
                 'key' => null,
@@ -255,8 +261,6 @@ class Api
             ));
 
             $result = $this->call($params, 'api/queryorder');
-        } else {
-            $result = $params;
         }
 
         return $this->parseResult($result);
@@ -314,17 +318,5 @@ class Api
         $params['statusReason'] = (isset($params['retmsg']) === true) ? $params['retmsg'] : 'unknown';
 
         return $params;
-    }
-
-    /**
-     * isSandbox.
-     *
-     * @method isSandbox
-     *
-     * @return bool
-     */
-    public function isSandbox()
-    {
-        return $this->options['sandbox'];
     }
 }

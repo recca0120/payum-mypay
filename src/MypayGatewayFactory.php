@@ -34,7 +34,6 @@ class MypayGatewayFactory extends GatewayFactory
 
             'payum.action.api.create_transaction' => new CreateTransactionAction(),
             'payum.action.api.get_transaction_data' => new GetTransactionDataAction(),
-            'payum.action.api.verify_hash' => new VerifyHashAction(),
         ]);
 
         if (false == $config['payum.api']) {
