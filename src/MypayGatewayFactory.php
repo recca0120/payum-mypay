@@ -7,7 +7,6 @@ use Http\Adapter\Guzzle5\Client as HttpGuzzle5Client;
 use Http\Adapter\Guzzle6\Client as HttpGuzzle6Client;
 use Http\Client\Curl\Client as HttpCurlClient;
 use Http\Client\Socket\Client as HttpSocketClient;
-use Http\Discovery\HttpClientDiscovery;
 use Payum\Core\Bridge\Httplug\HttplugClient;
 use Payum\Core\Bridge\Spl\ArrayObject;
 use Payum\Core\GatewayFactory;
@@ -19,9 +18,95 @@ use PayumTW\Mypay\Action\NotifyAction;
 use PayumTW\Mypay\Action\NotifyNullAction;
 use PayumTW\Mypay\Action\StatusAction;
 use PayumTW\Mypay\Action\SyncAction;
+use LogicException;
+use Symfony\Component\HttpFoundation\Request;
 
 class MypayGatewayFactory extends GatewayFactory
 {
+    public function getHttpClient($class)
+    {
+        switch ($class) {
+            case HttpGuzzle6Client::class:
+                $client = HttpGuzzle6Client::createWithConfig([
+                    'verify' => false,
+                ]);
+                break;
+
+            case HttpGuzzle5Client::class:
+                $client = new HttpGuzzle5Client([
+                    'defaults' => [
+                        'verify' => false,
+                    ],
+                ]);
+                break;
+
+            case HttpSocketClient::class:
+                $client = new HttpSocketClient(null, [
+                    'ssl' => [
+                        'verify_peer' => false,
+                        'verify_peer_name' => false,
+                    ],
+                ]);
+                break;
+
+            case HttpCurlClient::class:
+                $client = new HttpCurlClient($config['httplug.message_factory'], $config['httplug.stream_factory'], [
+                    CURLOPT_SSL_VERIFYHOST => false,
+                    CURLOPT_SSL_VERIFYPEER => false,
+                ]);
+                break;
+
+            case HttpBuzzClient::class:
+                $client = new HttpBuzzClient();
+                $client->setVerifyPeer(false);
+                break;
+
+            default:
+                throw new LogicException('The httplug.message_factory could not be guessed. Install one of the following packages: php-http/guzzle6-adapter, zendframework/zend-diactoros. You can also overwrite the config option with your implementation.');
+                break;
+        }
+
+        return $client;
+    }
+
+    public function getDefaultHttpClient()
+    {
+        $classes = [
+            HttpGuzzle6Client::class,
+            HttpGuzzle5Client::class,
+            HttpSocketClient::class,
+            HttpCurlClient::class,
+            HttpBuzzClient::class,
+        ];
+
+        foreach ($classes as $class) {
+            if (class_exists($class) === true) {
+                return $this->getHttpClient($class);
+            }
+        }
+
+        throw new LogicException('The httplug.message_factory could not be guessed. Install one of the following packages: php-http/guzzle6-adapter, zendframework/zend-diactoros. You can also overwrite the config option with your implementation.');
+    }
+
+    public function getClientIp() {
+        $keys = [
+            'HTTP_CLIENT_IP',
+            'HTTP_X_FORWARDED_FOR',
+            'HTTP_X_FORWARDED',
+            'HTTP_FORWARDED_FOR',
+            'HTTP_FORWARDED',
+            'REMOTE_ADDR',
+        ];
+
+        foreach ($keys as $key) {
+            if (array_key_exists($key, $_SERVER) === true) {
+                return $_SERVER[$key];
+            }
+        }
+
+        return '::1';
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -42,61 +127,19 @@ class MypayGatewayFactory extends GatewayFactory
             'payum.action.api.get_transaction_data' => new GetTransactionDataAction(),
         ]);
 
+
+
+        $httpClient = $this->getDefaultHttpClient();
         $config->replace([
-            'httplug.client' => function (ArrayObject $config) {
-                // if (class_exists(HttpClientDiscovery::class)) {
-                //     return HttpClientDiscovery::find();
-                // }
-
-                if (class_exists(HttpGuzzle6Client::class)) {
-                    return HttpGuzzle6Client::createWithConfig([
-                        'verify' => false,
-                    ]);
-                }
-
-                if (class_exists(HttpGuzzle5Client::class)) {
-                    return new HttpGuzzle5Client([
-                        'defaults' => [
-                            'verify' => false,
-                        ],
-                    ]);
-                }
-
-                if (class_exists(HttpSocketClient::class)) {
-                    return new HttpSocketClient(null, [
-                        'ssl' => [
-                            'verify_peer' => false,
-                            'verify_peer_name' => false,
-                        ],
-                    ]);
-                }
-
-                if (class_exists(HttpCurlClient::class)) {
-                    return new HttpCurlClient($config['httplug.message_factory'], $config['httplug.stream_factory'], [
-                        CURLOPT_SSL_VERIFYHOST => false,
-                        CURLOPT_SSL_VERIFYPEER => false,
-                    ]);
-                }
-
-                if (class_exists(HttpBuzzClient::class)) {
-                    $client = new HttpBuzzClient();
-                    $client->setVerifyPeer(false);
-
-                    return $client;
-                }
-
-                throw new \LogicException('The httplug.client could not be guessed. Install one of the following packages: php-http/guzzle6-adapter. You can also overwrite the config option with your implementation.');
-            },
-            'payum.http_client' => function (ArrayObject $config) {
-                return new HttplugClient($config['httplug.client']);
-            },
+            'httplug.client' => $httpClient,
+            'payum.http_client' => new HttplugClient($httpClient),
         ]);
 
         if (false == $config['payum.api']) {
             $config['payum.default_options'] = [
                 'store_uid' => null,
                 'key' => null,
-                'ip' => $_SERVER['REMOTE_ADDR'],
+                'ip' => $this->getClientIp(),
                 'sandbox' => true,
             ];
 

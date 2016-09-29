@@ -47,8 +47,6 @@ class MypayGatewayFactoryTest extends PHPUnit_Framework_TestCase
             'httplug.message_factory' => $message,
         ]);
 
-        $config['httplug.client'] = call_user_func($config['httplug.client'], ArrayObject::ensureArrayObject($config));
-        $config['payum.http_client'] = call_user_func($config['payum.http_client'], ArrayObject::ensureArrayObject($config));
         $api = call_user_func($config['payum.api'], ArrayObject::ensureArrayObject($config));
         $this->assertInstanceOf('PayumTW\Mypay\Api', $api);
     }
