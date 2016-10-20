@@ -7,6 +7,7 @@ use Http\Adapter\Guzzle5\Client as HttpGuzzle5Client;
 use Http\Adapter\Guzzle6\Client as HttpGuzzle6Client;
 use Http\Client\Curl\Client as HttpCurlClient;
 use Http\Client\Socket\Client as HttpSocketClient;
+use LogicException;
 use Payum\Core\Bridge\Httplug\HttplugClient;
 use Payum\Core\Bridge\Spl\ArrayObject;
 use Payum\Core\GatewayFactory;
@@ -18,7 +19,6 @@ use PayumTW\Mypay\Action\NotifyAction;
 use PayumTW\Mypay\Action\NotifyNullAction;
 use PayumTW\Mypay\Action\StatusAction;
 use PayumTW\Mypay\Action\SyncAction;
-use LogicException;
 use Symfony\Component\HttpFoundation\Request;
 
 class MypayGatewayFactory extends GatewayFactory

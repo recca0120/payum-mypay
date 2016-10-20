@@ -114,7 +114,7 @@ class Api
      */
     public function getApiEndpoint()
     {
-        return 'https://authorize.usecase.cc/api/authorize/makeOrderEncryConnection';
+        return $this->options['sandbox'] === false ? 'https://mypay.tw/api/init':'https://pay.usecase.cc/api/init';
     }
 
     /**
@@ -231,7 +231,9 @@ class Api
             array_intersect_key($params, $supportedParams)
         ));
 
-        return $this->call($params, 'api/orders');
+        $result = $this->call($params, 'api/orders');
+
+        return $result;
     }
 
     /**

@@ -51,6 +51,10 @@ class StatusAction implements ActionInterface
             return;
         }
 
+        if (isset($details['SysCode']) === true && isset($details['ResultCode']) === true && $details['ResultCode'] == '100') {
+            $request->markFailed();
+        }
+
         $request->markNew();
     }
 

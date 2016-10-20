@@ -2,6 +2,7 @@
 
 namespace PayumTW\Mypay\Action\Api;
 
+use LogicException;
 use Payum\Core\Bridge\Spl\ArrayObject;
 use Payum\Core\Exception\RequestNotSupportedException;
 use Payum\Core\Reply\HttpRedirect;
@@ -20,9 +21,14 @@ class CreateTransactionAction extends BaseApiAwareAction
 
         $details = ArrayObject::ensureArrayObject($request->getModel());
 
-        $details->replace($this->api->createTransaction((array) $details));
+        $result = $this->api->createTransaction((array) $details);
+        $details->replace($result);
 
-        throw new HttpRedirect($details['url']);
+        if (isset($result['url']) === false) {
+            throw new LogicException("Response content is not valid json: \n\n".json_encode($result));
+        } else {
+            throw new HttpRedirect($details['url']);
+        }
     }
 
     /**

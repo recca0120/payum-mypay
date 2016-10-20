@@ -10,7 +10,73 @@ class ApiTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-    public function test_apiendpoint()
+    public function test_production_endpoint() {
+        /*
+        |------------------------------------------------------------
+        | Set
+        |------------------------------------------------------------
+        */
+
+        $httpClient = m::mock('Payum\Core\HttpClientInterface');
+        $message = m::mock('Http\Message\MessageFactory');
+        $request = m::mock('Psr\Http\Message\RequestInterface');
+        $response = m::mock('stdClass');
+        $options = [
+            'store_uid' => '123',
+            'key' => md5(rand()),
+            'ip' => '::1',
+            'sandbox' => false
+        ];
+        $api = new Api($options, $httpClient, $message);
+
+        /*
+        |------------------------------------------------------------
+        | Expectation
+        |------------------------------------------------------------
+        */
+
+        /*
+        |------------------------------------------------------------
+        | Assertion
+        |------------------------------------------------------------
+        */
+        $this->assertSame('https://mypay.tw/api/init', $api->getApiEndpoint());
+    }
+
+    public function test_sand_endpoint() {
+        /*
+        |------------------------------------------------------------
+        | Set
+        |------------------------------------------------------------
+        */
+
+        $httpClient = m::mock('Payum\Core\HttpClientInterface');
+        $message = m::mock('Http\Message\MessageFactory');
+        $request = m::mock('Psr\Http\Message\RequestInterface');
+        $response = m::mock('stdClass');
+        $options = [
+            'store_uid' => '123',
+            'key' => md5(rand()),
+            'ip' => '::1',
+            'sandbox' => true
+        ];
+        $api = new Api($options, $httpClient, $message);
+
+        /*
+        |------------------------------------------------------------
+        | Expectation
+        |------------------------------------------------------------
+        */
+
+        /*
+        |------------------------------------------------------------
+        | Assertion
+        |------------------------------------------------------------
+        */
+        $this->assertSame('https://pay.usecase.cc/api/init', $api->getApiEndpoint());
+    }
+
+    public function test_create_transaction()
     {
         /*
         |------------------------------------------------------------
@@ -26,6 +92,7 @@ class ApiTest extends PHPUnit_Framework_TestCase
             'store_uid' => '123',
             'key' => md5(rand()),
             'ip' => '::1',
+            'sandbox' => true
         ];
 
         /*
@@ -80,6 +147,12 @@ class ApiTest extends PHPUnit_Framework_TestCase
 
             return $request;
         });
+
+        /*
+        |------------------------------------------------------------
+        | Assertion
+        |------------------------------------------------------------
+        */
 
         $api = new Api($options, $httpClient, $message);
         $result = $api->createTransaction($params);
