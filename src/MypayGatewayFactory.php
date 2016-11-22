@@ -19,7 +19,6 @@ use PayumTW\Mypay\Action\NotifyAction;
 use PayumTW\Mypay\Action\NotifyNullAction;
 use PayumTW\Mypay\Action\StatusAction;
 use PayumTW\Mypay\Action\SyncAction;
-use Symfony\Component\HttpFoundation\Request;
 
 class MypayGatewayFactory extends GatewayFactory
 {
@@ -88,7 +87,8 @@ class MypayGatewayFactory extends GatewayFactory
         throw new LogicException('The httplug.message_factory could not be guessed. Install one of the following packages: php-http/guzzle6-adapter, zendframework/zend-diactoros. You can also overwrite the config option with your implementation.');
     }
 
-    public function getClientIp() {
+    public function getClientIp()
+    {
         $keys = [
             'HTTP_CLIENT_IP',
             'HTTP_X_FORWARDED_FOR',
@@ -126,8 +126,6 @@ class MypayGatewayFactory extends GatewayFactory
             'payum.action.api.create_transaction' => new CreateTransactionAction(),
             'payum.action.api.get_transaction_data' => new GetTransactionDataAction(),
         ]);
-
-
 
         $httpClient = $this->getDefaultHttpClient();
         $config->replace([

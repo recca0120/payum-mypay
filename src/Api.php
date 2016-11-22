@@ -6,6 +6,7 @@ use Http\Message\MessageFactory;
 use LogicException;
 use Payum\Core\Exception\Http\HttpException;
 use Payum\Core\HttpClientInterface;
+use phpseclib\Crypt\AES;
 
 class Api
 {
@@ -114,7 +115,7 @@ class Api
      */
     public function getApiEndpoint()
     {
-        return $this->options['sandbox'] === false ? 'https://mypay.tw/api/init':'https://pay.usecase.cc/api/init';
+        return $this->options['sandbox'] === false ? 'https://mypay.tw/api/init' : 'https://pay.usecase.cc/api/init';
     }
 
     /**
@@ -296,16 +297,22 @@ class Api
      */
     protected function calculateHash(array $params)
     {
+        // $size = mcrypt_get_iv_size(MCRYPT_CAST_256, MCRYPT_MODE_CBC);
+        // $iv = mcrypt_create_iv($size, MCRYPT_DEV_URANDOM);
+        // $padding = 16 - (strlen($data) % 16);
+        // $data .= str_repeat(chr($padding), $padding);
+        // $data = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $this->options['key'], $data, MCRYPT_MODE_CBC, $iv);
+        // $data = base64_encode($iv.$data);
+
+        // return $data;
+
         $data = json_encode($params);
 
-        $size = mcrypt_get_iv_size(MCRYPT_CAST_256, MCRYPT_MODE_CBC);
-        $iv = mcrypt_create_iv($size, MCRYPT_DEV_URANDOM);
-        $padding = 16 - (strlen($data) % 16);
-        $data .= str_repeat(chr($padding), $padding);
-        $data = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $this->options['key'], $data, MCRYPT_MODE_CBC, $iv);
-        $data = base64_encode($iv.$data);
+        $cipher = new AES(AES::MODE_CBC);
+        $cipher->setKey($this->options['key']);
+        $encrypt = $cipher->encrypt($data);
 
-        return $data;
+        return base64_encode($cipher->encryptIV.$encrypt);
     }
 
     /**

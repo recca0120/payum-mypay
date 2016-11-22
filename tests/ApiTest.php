@@ -10,7 +10,8 @@ class ApiTest extends PHPUnit_Framework_TestCase
         m::close();
     }
 
-    public function test_production_endpoint() {
+    public function test_production_endpoint()
+    {
         /*
         |------------------------------------------------------------
         | Set
@@ -25,7 +26,7 @@ class ApiTest extends PHPUnit_Framework_TestCase
             'store_uid' => '123',
             'key' => md5(rand()),
             'ip' => '::1',
-            'sandbox' => false
+            'sandbox' => false,
         ];
         $api = new Api($options, $httpClient, $message);
 
@@ -43,7 +44,8 @@ class ApiTest extends PHPUnit_Framework_TestCase
         $this->assertSame('https://mypay.tw/api/init', $api->getApiEndpoint());
     }
 
-    public function test_sand_endpoint() {
+    public function test_sand_endpoint()
+    {
         /*
         |------------------------------------------------------------
         | Set
@@ -58,7 +60,7 @@ class ApiTest extends PHPUnit_Framework_TestCase
             'store_uid' => '123',
             'key' => md5(rand()),
             'ip' => '::1',
-            'sandbox' => true
+            'sandbox' => true,
         ];
         $api = new Api($options, $httpClient, $message);
 
@@ -92,7 +94,7 @@ class ApiTest extends PHPUnit_Framework_TestCase
             'store_uid' => '123',
             'key' => md5(rand()),
             'ip' => '::1',
-            'sandbox' => true
+            'sandbox' => true,
         ];
 
         /*
