@@ -2,6 +2,7 @@
 
 use Mockery as m;
 use PayumTW\Mypay\Api;
+use phpseclib\Crypt\AES;
 
 class ApiTest extends PHPUnit_Framework_TestCase
 {
@@ -165,7 +166,15 @@ class ApiTest extends PHPUnit_Framework_TestCase
         $result = base64_decode($data);
         $iv = substr($result, 0, 16);
         $result = substr($result, 16);
-        $result = mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $key, $result, MCRYPT_MODE_CBC, $iv);
+
+        if (version_compare(PHP_VERSION, '7.1', '>=') === true) {
+            $cipher = new AES(AES::MODE_CBC);
+            $cipher->setKey($key);
+            $cipher->setIV($iv);
+            $result = $cipher->decrypt($result);
+        } else {
+            $result = mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $key, $result, MCRYPT_MODE_CBC, $iv);
+        }
 
         return json_decode(substr($result, 0, strrpos($result, '}') + 1), true);
     }
