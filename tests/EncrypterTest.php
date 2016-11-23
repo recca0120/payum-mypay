@@ -54,10 +54,14 @@ class EncrypterTest extends PHPUnit_Framework_TestCase
         $this->assertSame($params, json_decode($encrypter->decrypt($encrypt), true));
 
         if (version_compare(PHP_VERSION, '7.1', '<') === true) {
+            $encrypt = $encrypter->encrypt(json_encode($params));
             $this->assertSame($params, json_decode($encrypter->decryptByPHP($encrypt), true));
 
             $encrypt = $encrypter->encryptByPHP(json_encode($params));
             $this->assertSame($params, json_decode($encrypter->decrypt($encrypt), true));
+
+            $encrypt = $encrypter->encryptByPHP(json_encode($params));
+            $this->assertSame($params, json_decode($encrypter->decryptByPHP($encrypt), true));
         }
     }
 }
