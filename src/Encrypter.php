@@ -137,7 +137,7 @@ class Encrypter
      */
     protected function pkcs5Unpad($plaintext)
     {
-        $pad = ord($plaintext{strlen($plaintext) - 1});
+        $pad = ord($plaintext[strlen($plaintext) - 1]);
         if ($pad > strlen($plaintext)) {
             return false;
         }
