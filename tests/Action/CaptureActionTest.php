@@ -63,4 +63,45 @@ class CaptureActionTest extends PHPUnit_Framework_TestCase
         $action->setGenericTokenFactory($tokenFactory);
         $action->execute($request);
     }
+
+    public function test_mypay_response()
+    {
+        /*
+        |------------------------------------------------------------
+        | Set
+        |------------------------------------------------------------
+        */
+
+        $action = new CaptureAction();
+        $gateway = m::mock('Payum\Core\GatewayInterface');
+        $request = m::mock('Payum\Core\Request\Capture');
+        $tokenFactory = m::mock('Payum\Core\Security\GenericTokenFactoryInterface');
+        $token = m::mock('stdClass');
+        $notifyToken = m::mock('stdClass');
+        $details = new ArrayObject([
+            'uid' => 'foo.uid',
+        ]);
+
+        /*
+        |------------------------------------------------------------
+        | Expectation
+        |------------------------------------------------------------
+        */
+
+        $request
+            ->shouldReceive('getModel')->twice()->andReturn($details);
+
+        $gateway
+            ->shouldReceive('execute')->with(m::type('Payum\Core\Request\Sync'))->once();
+
+        /*
+        |------------------------------------------------------------
+        | Assertion
+        |------------------------------------------------------------
+        */
+
+        $action->setGateway($gateway);
+        $action->setGenericTokenFactory($tokenFactory);
+        $action->execute($request);
+    }
 }

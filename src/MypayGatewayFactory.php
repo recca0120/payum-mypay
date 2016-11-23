@@ -87,7 +87,7 @@ class MypayGatewayFactory extends GatewayFactory
         throw new LogicException('The httplug.message_factory could not be guessed. Install one of the following packages: php-http/guzzle6-adapter, zendframework/zend-diactoros. You can also overwrite the config option with your implementation.');
     }
 
-    public function getClientIp()
+    public function getClientIp($server)
     {
         $keys = [
             'HTTP_CLIENT_IP',
@@ -99,8 +99,8 @@ class MypayGatewayFactory extends GatewayFactory
         ];
 
         foreach ($keys as $key) {
-            if (array_key_exists($key, $_SERVER) === true) {
-                return $_SERVER[$key];
+            if (array_key_exists($key, $server) === true) {
+                return $server[$key];
             }
         }
 
@@ -133,11 +133,12 @@ class MypayGatewayFactory extends GatewayFactory
             'payum.http_client' => new HttplugClient($httpClient),
         ]);
 
+        $server = isset($config['server']) === true ? $config['server'] : $_SERVER;
         if (false == $config['payum.api']) {
             $config['payum.default_options'] = [
                 'store_uid' => null,
                 'key' => null,
-                'ip' => $this->getClientIp(),
+                'ip' => $this->getClientIp($server),
                 'sandbox' => true,
             ];
 

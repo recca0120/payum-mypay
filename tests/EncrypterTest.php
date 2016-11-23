@@ -20,6 +20,7 @@ class EncrypterTest extends PHPUnit_Framework_TestCase
 
         $key = md5(rand());
         $encrypter = new Encrypter($key);
+        $encrypter->setKey($key);
 
         /*
         |------------------------------------------------------------

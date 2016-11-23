@@ -173,4 +173,38 @@ class StatusActionTest extends PHPUnit_Framework_TestCase
 
         $action->execute($request);
     }
+
+    public function test_request_syscode_mark_failed()
+    {
+        /*
+        |------------------------------------------------------------
+        | Set
+        |------------------------------------------------------------
+        */
+
+        $action = new StatusAction();
+        $request = m::mock('Payum\Core\Request\GetStatusInterface');
+        $details = new ArrayObject([
+            'SysCode' => '-1',
+            'ResultCode' => '100',
+        ]);
+
+        /*
+        |------------------------------------------------------------
+        | Expectation
+        |------------------------------------------------------------
+        */
+
+        $request
+            ->shouldReceive('getModel')->andReturn($details)->twice()
+            ->shouldReceive('markFailed')->once();
+
+        /*
+        |------------------------------------------------------------
+        | Assertion
+        |------------------------------------------------------------
+        */
+
+        $action->execute($request);
+    }
 }

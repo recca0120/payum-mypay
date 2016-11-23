@@ -34,13 +34,13 @@ class MypayGatewayFactoryTest extends PHPUnit_Framework_TestCase
         |------------------------------------------------------------
         */
 
-        $_SERVER['REMOTE_ADDR'] = '::1';
         $gateway = new MypayGatewayFactory();
         $config = $gateway->createConfig([
             'payum.api' => false,
             'store_uid' => md5(rand()),
             'key' => md5(rand()),
             'ip' => '::1',
+            'server' => [],
             'sandbox' => false,
             'payum.required_options' => [],
             'payum.http_client' => $httpClient,
