@@ -22,65 +22,46 @@ use PayumTW\Mypay\Action\SyncAction;
 
 class MypayGatewayFactory extends GatewayFactory
 {
-    public function getHttpClient($class)
+    public function getDefaultHttpClient($config)
     {
-        switch ($class) {
-            case HttpGuzzle6Client::class:
-                $client = HttpGuzzle6Client::createWithConfig([
+        $classes = [
+            HttpGuzzle6Client::class => function () {
+                return HttpGuzzle6Client::createWithConfig([
                     'verify' => false,
                 ]);
-                break;
-
-            case HttpGuzzle5Client::class:
-                $client = new HttpGuzzle5Client([
+            },
+            HttpGuzzle5Client::class => function () {
+                return new HttpGuzzle5Client([
                     'defaults' => [
                         'verify' => false,
                     ],
                 ]);
-                break;
-
-            case HttpSocketClient::class:
-                $client = new HttpSocketClient(null, [
+            },
+            HttpSocketClient::class => function () {
+                return new HttpSocketClient(null, [
                     'ssl' => [
                         'verify_peer' => false,
                         'verify_peer_name' => false,
                     ],
                 ]);
-                break;
-
-            case HttpCurlClient::class:
-                $client = new HttpCurlClient($config['httplug.message_factory'], $config['httplug.stream_factory'], [
+            },
+            HttpCurlClient::class => function () use ($config) {
+                return new HttpCurlClient($config['httplug.message_factory'], $config['httplug.stream_factory'], [
                     CURLOPT_SSL_VERIFYHOST => false,
                     CURLOPT_SSL_VERIFYPEER => false,
                 ]);
-                break;
-
-            case HttpBuzzClient::class:
+            },
+            HttpBuzzClient::class => function () {
                 $client = new HttpBuzzClient();
                 $client->setVerifyPeer(false);
-                break;
 
-            default:
-                throw new LogicException('The httplug.message_factory could not be guessed. Install one of the following packages: php-http/guzzle6-adapter, zendframework/zend-diactoros. You can also overwrite the config option with your implementation.');
-                break;
-        }
-
-        return $client;
-    }
-
-    public function getDefaultHttpClient()
-    {
-        $classes = [
-            HttpGuzzle6Client::class,
-            HttpGuzzle5Client::class,
-            HttpSocketClient::class,
-            HttpCurlClient::class,
-            HttpBuzzClient::class,
+                return $client;
+            },
         ];
 
-        foreach ($classes as $class) {
-            if (class_exists($class) === true) {
-                return $this->getHttpClient($class);
+        foreach ($classes as $className => $closure) {
+            if (class_exists($className) === true) {
+                return $closure();
             }
         }
 
@@ -127,7 +108,7 @@ class MypayGatewayFactory extends GatewayFactory
             'payum.action.api.get_transaction_data' => new GetTransactionDataAction(),
         ]);
 
-        $httpClient = $this->getDefaultHttpClient();
+        $httpClient = $this->getDefaultHttpClient($config);
         $config->replace([
             'httplug.client' => $httpClient,
             'payum.http_client' => new HttplugClient($httpClient),
