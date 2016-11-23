@@ -78,7 +78,7 @@ class Api
         $this->options = $options;
         $this->client = $client;
         $this->messageFactory = $messageFactory;
-        $this->encrypter = is_null($encrypter) === true ? new Encrypter() : $encrypter;
+        $this->encrypter = is_null($encrypter) === true ? new Encrypter($this->options['key']) : $encrypter;
     }
 
     /**
@@ -297,9 +297,7 @@ class Api
      */
     protected function calculateHash(array $params)
     {
-        return $this->encrypter
-            ->setKey($this->options['key'])
-            ->encrypt(json_encode($params));
+        return $this->encrypter->encrypt(json_encode($params));
     }
 
     /**

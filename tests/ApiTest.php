@@ -132,7 +132,6 @@ class ApiTest extends PHPUnit_Framework_TestCase
         */
 
         $encrypter
-            ->shouldReceive('setKey')->with($options['key'])->twice()->andReturnSelf()
             ->shouldReceive('encrypt')->with($apiParams)->once()->andReturn('foo.api-params')
             ->shouldReceive('encrypt')->once()->andReturn('foo.encrypt');
 
@@ -191,7 +190,6 @@ class ApiTest extends PHPUnit_Framework_TestCase
         */
 
         $encrypter
-            ->shouldReceive('setKey')->with($options['key'])->twice()->andReturnSelf()
             ->shouldReceive('encrypt')->with($apiParams)->once()->andReturn('foo.api-params')
             ->shouldReceive('encrypt')->once()->andReturn('foo.encrypt');
 

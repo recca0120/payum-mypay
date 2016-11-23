@@ -6,15 +6,43 @@ use phpseclib\Crypt\AES;
 
 class Encrypter
 {
+    /**
+     * $cipher.
+     *
+     * @var phpseclib\Crypt\AES
+     */
     protected $cipher;
 
+    /**
+     * $key.
+     *
+     * @var string
+     */
     protected $key;
 
-    public function __construct(AES $cipher = null)
+    /**
+     * __construct.
+     *
+     * @method __construct
+     *
+     * @param string               $key
+     * @param phpseclib\Crypt\AES  $cipher
+     */
+    public function __construct($key, AES $cipher = null)
     {
+        $this->key = $key;
         $this->cipher = is_null($cipher) === true ? new AES(AES::MODE_CBC) : $cipher;
     }
 
+    /**
+     * setKey.
+     *
+     * @method setKey
+     *
+     * @param string    $key
+     *
+     * @return self
+     */
     public function setKey($key)
     {
         $this->key = $key;
@@ -22,6 +50,15 @@ class Encrypter
         return $this;
     }
 
+    /**
+     * encrypt.
+     *
+     * @method encrypt
+     *
+     * @param string    $plaintext
+     *
+     * @return string
+     */
     public function encrypt($plaintext)
     {
         $this->cipher->setKey($this->key);
@@ -31,6 +68,15 @@ class Encrypter
         return base64_encode($iv.$result);
     }
 
+    /**
+     * decrypt.
+     *
+     * @method decrypt
+     *
+     * @param string    $ciphertext
+     *
+     * @return string
+     */
     public function decrypt($ciphertext)
     {
         $encryptWithIV = base64_decode($ciphertext);
@@ -42,6 +88,15 @@ class Encrypter
         return $this->cipher->decrypt($ciphertext);
     }
 
+    /**
+     * encryptByPHP.
+     *
+     * @method encryptByPHP
+     *
+     * @param string    $plaintext
+     *
+     * @return string
+     */
     public function encryptByPHP($plaintext)
     {
         $size = mcrypt_get_iv_size(MCRYPT_CAST_256, MCRYPT_MODE_CBC);
@@ -53,6 +108,15 @@ class Encrypter
         return base64_encode($iv.$ciphertext);
     }
 
+    /**
+     * decryptByPHP.
+     *
+     * @method decryptByPHP
+     *
+     * @param string    $ciphertext
+     *
+     * @return string
+     */
     public function decryptByPHP($ciphertext)
     {
         $encryptWithIV = base64_decode($ciphertext);
@@ -62,17 +126,26 @@ class Encrypter
         return $this->pkcs5Unpad(mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $this->key, $ciphertext, MCRYPT_MODE_CBC, $iv));
     }
 
-    protected function pkcs5Unpad($text)
+    /**
+     * pkcs5Unpad.
+     *
+     * @method pkcs5Unpad
+     *
+     * @param string   $text
+     *
+     * @return string
+     */
+    protected function pkcs5Unpad($plaintext)
     {
-        $pad = ord($text{strlen($text) - 1});
-        if ($pad > strlen($text)) {
+        $pad = ord($plaintext{strlen($plaintext) - 1});
+        if ($pad > strlen($plaintext)) {
             return false;
         }
 
-        if (strspn($text, chr($pad), strlen($text) - $pad) != $pad) {
+        if (strspn($plaintext, chr($pad), strlen($plaintext) - $pad) != $pad) {
             return false;
         }
 
-        return substr($text, 0, -1 * $pad);
+        return substr($plaintext, 0, -1 * $pad);
     }
 }
