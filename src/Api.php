@@ -48,25 +48,6 @@ class Api
     protected $options = [];
 
     /**
-     * @var array
-     */
-    protected $code = [
-        '100' => '資料錯誤  金流系統收到錯誤要求付費資料',
-        '200' => '資料正確  金流系統收到正確的要求付費資料',
-        '250' => '付款成功  此次交易付款完成',
-        '260' => '交易成功  超商代碼繳費­請等候消費者繳費入帳',
-        '270' => '交易成功  虛擬帳號­請等候消費者繳費入帳',
-        '280' => '交易成功  儲值/WEBATM­線上待付款，但需要等到使用者線上確認交易',
-        '290' => '交易成功，但資訊不符  交易成功，但資訊不符(包含金額、已逾期...等)',
-        '300' => '交易失敗  風險控管限制不予交易或服務商不予交易',
-        '380' => '逾期交易  如超商代碼或虛擬帳號超過系統設定的限制繳費期限時',
-        '400' => '系統錯誤訊息  若付費系統服務或上游服務商系統異常時',
-        '600' => '結帳完成  信用卡為結帳狀態',
-        'A0001' => '中斷交易  上游提供交易服務商發生異常或網路中斷',
-        'A0002' => '未完成交易  消費者未做任何消費動作時',
-    ];
-
-    /**
      * @param array               $options
      * @param HttpClientInterface $client
      * @param MessageFactory      $messageFactory
@@ -266,7 +247,7 @@ class Api
             $details = $this->call($params, 'api/queryorder');
         }
 
-        return $this->parseResult($details);
+        return$details;
     }
 
     /**
@@ -298,19 +279,5 @@ class Api
     protected function calculateHash(array $params)
     {
         return $this->encrypter->encrypt(json_encode($params));
-    }
-
-    /**
-     * parseResult.
-     *
-     * @param mixed $params
-     *
-     * @return array
-     */
-    public function parseResult($params)
-    {
-        $params['statusReason'] = (isset($params['retmsg']) === true) ? $params['retmsg'] : 'unknown';
-
-        return $params;
     }
 }
