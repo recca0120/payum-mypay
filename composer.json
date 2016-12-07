@@ -1,8 +1,8 @@
 {
     "name": "payum-tw/mypay",
     "type": "project",
-    "description": "The Payum extension. Rapid extensino development",
-    "keywords": ["payment"],
+    "description": "The Payum extension. MyPay金流",
+    "keywords": ["MyPay", "金流程式", "Payum", "PayumTW"],
     "homepage": "http://payum.org",
     "license": "MIT",
     "authors": [
