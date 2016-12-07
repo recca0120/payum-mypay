@@ -1,8 +1,8 @@
 <?php
 
 use Mockery as m;
-use PayumTW\Mypay\Action\NotifyNullAction;
 use PayumTW\Mypay\Api;
+use PayumTW\Mypay\Action\NotifyNullAction;
 
 class NotifyNullActionTest extends PHPUnit_Framework_TestCase
 {

@@ -2,23 +2,23 @@
 
 namespace PayumTW\Mypay;
 
+use LogicException;
+use Payum\Core\GatewayFactory;
+use PayumTW\Mypay\Action\SyncAction;
+use Payum\Core\Bridge\Spl\ArrayObject;
+use PayumTW\Mypay\Action\NotifyAction;
+use PayumTW\Mypay\Action\StatusAction;
+use PayumTW\Mypay\Action\CaptureAction;
+use PayumTW\Mypay\Action\NotifyNullAction;
+use Payum\Core\Bridge\Httplug\HttplugClient;
+use Http\Client\Curl\Client as HttpCurlClient;
+use PayumTW\Mypay\Action\ConvertPaymentAction;
 use Http\Adapter\Buzz\Client as HttpBuzzClient;
+use Http\Client\Socket\Client as HttpSocketClient;
 use Http\Adapter\Guzzle5\Client as HttpGuzzle5Client;
 use Http\Adapter\Guzzle6\Client as HttpGuzzle6Client;
-use Http\Client\Curl\Client as HttpCurlClient;
-use Http\Client\Socket\Client as HttpSocketClient;
-use LogicException;
-use Payum\Core\Bridge\Httplug\HttplugClient;
-use Payum\Core\Bridge\Spl\ArrayObject;
-use Payum\Core\GatewayFactory;
 use PayumTW\Mypay\Action\Api\CreateTransactionAction;
 use PayumTW\Mypay\Action\Api\GetTransactionDataAction;
-use PayumTW\Mypay\Action\CaptureAction;
-use PayumTW\Mypay\Action\ConvertPaymentAction;
-use PayumTW\Mypay\Action\NotifyAction;
-use PayumTW\Mypay\Action\NotifyNullAction;
-use PayumTW\Mypay\Action\StatusAction;
-use PayumTW\Mypay\Action\SyncAction;
 
 class MypayGatewayFactory extends GatewayFactory
 {

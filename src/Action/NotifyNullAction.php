@@ -2,14 +2,14 @@
 
 namespace PayumTW\Mypay\Action;
 
-use Payum\Core\Action\ActionInterface;
-use Payum\Core\Exception\RequestNotSupportedException;
-use Payum\Core\GatewayAwareInterface;
-use Payum\Core\GatewayAwareTrait;
-use Payum\Core\Request\GetHttpRequest;
-use Payum\Core\Request\GetToken;
-use Payum\Core\Request\Notify;
 use PayumTW\Mypay\Api;
+use Payum\Core\Request\Notify;
+use Payum\Core\Request\GetToken;
+use Payum\Core\GatewayAwareTrait;
+use Payum\Core\GatewayAwareInterface;
+use Payum\Core\Action\ActionInterface;
+use Payum\Core\Request\GetHttpRequest;
+use Payum\Core\Exception\RequestNotSupportedException;
 
 class NotifyNullAction implements ActionInterface, GatewayAwareInterface
 {

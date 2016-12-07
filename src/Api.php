@@ -2,10 +2,10 @@
 
 namespace PayumTW\Mypay;
 
-use Http\Message\MessageFactory;
 use LogicException;
-use Payum\Core\Exception\Http\HttpException;
+use Http\Message\MessageFactory;
 use Payum\Core\HttpClientInterface;
+use Payum\Core\Exception\Http\HttpException;
 
 class Api
 {

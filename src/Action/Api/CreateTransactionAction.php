@@ -3,10 +3,10 @@
 namespace PayumTW\Mypay\Action\Api;
 
 use LogicException;
-use Payum\Core\Bridge\Spl\ArrayObject;
-use Payum\Core\Exception\RequestNotSupportedException;
 use Payum\Core\Reply\HttpRedirect;
+use Payum\Core\Bridge\Spl\ArrayObject;
 use PayumTW\Mypay\Request\Api\CreateTransaction;
+use Payum\Core\Exception\RequestNotSupportedException;
 
 class CreateTransactionAction extends BaseApiAwareAction
 {
