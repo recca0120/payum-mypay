@@ -1,6 +1,6 @@
 <?php
 
-namespace PayumTW\MyPay\Action;
+namespace PayumTW\Mypay\Action;
 
 use Payum\Core\Request\Sync;
 use Payum\Core\Request\Notify;
@@ -10,7 +10,7 @@ use Payum\Core\GatewayAwareInterface;
 use Payum\Core\Action\ActionInterface;
 use Payum\Core\Bridge\Spl\ArrayObject;
 use Payum\Core\Request\GetHttpRequest;
-use PayumTW\MyPay\Action\Api\BaseApiAwareAction;
+use PayumTW\Mypay\Action\Api\BaseApiAwareAction;
 use Payum\Core\Exception\RequestNotSupportedException;
 
 class NotifyAction extends BaseApiAwareAction implements ActionInterface, GatewayAwareInterface
