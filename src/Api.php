@@ -227,27 +227,30 @@ class Api
      */
     public function getTransactionData(array $params)
     {
-        if (empty($params['response']) === false) {
-            $details = $params['response'];
+        $supportedParams = [
+            'uid' => null,
+            'key' => null,
+        ];
 
-            if ($params['key'] !== $details['key']) {
-                $details['code'] = '-1';
-            }
-        } else {
-            $supportedParams = [
-                'uid' => null,
-                'key' => null,
-            ];
+        $params = array_filter(array_replace(
+            $supportedParams,
+            array_intersect_key($params, $supportedParams)
+        ));
 
-            $params = array_filter(array_replace(
-                $supportedParams,
-                array_intersect_key($params, $supportedParams)
-            ));
+        return $this->call($params, 'api/queryorder');
+    }
 
-            $details = $this->call($params, 'api/queryorder');
-        }
-
-        return$details;
+    /**
+     * verifyHash.
+     *
+     * @param  array $params
+     * @param  array $details
+     *
+     * @return bool
+     */
+    public function verifyHash(array $params, $details)
+    {
+        return $params['key'] === $details['key'];
     }
 
     /**

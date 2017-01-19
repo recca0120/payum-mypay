@@ -22,11 +22,11 @@ class CreateTransactionAction extends BaseApiAwareAction
         $details = ArrayObject::ensureArrayObject($request->getModel());
 
         $result = $this->api->createTransaction((array) $details);
-        $details->replace($result);
 
         if (isset($result['url']) === false) {
             throw new LogicException("Response content is not valid json: \n\n".json_encode($result));
         } else {
+            $details->replace($result);
             throw new HttpRedirect($details['url']);
         }
     }

@@ -15,93 +15,170 @@ class CaptureActionTest extends PHPUnit_Framework_TestCase
     {
         /*
         |------------------------------------------------------------
-        | Set
+        | Arrange
         |------------------------------------------------------------
         */
 
-        $action = new CaptureAction();
-        $gateway = m::mock('Payum\Core\GatewayInterface');
-        $request = m::mock('Payum\Core\Request\Capture');
-        $tokenFactory = m::mock('Payum\Core\Security\GenericTokenFactoryInterface');
-        $token = m::mock('stdClass');
-        $notifyToken = m::mock('stdClass');
+        $api = m::spy('PayumTW\Mypay\Api');
+        $gateway = m::spy('Payum\Core\GatewayInterface');
+        $request = m::spy('Payum\Core\Request\Capture');
+        $tokenFactory = m::spy('Payum\Core\Security\GenericTokenFactoryInterface');
+        $token = m::spy('Payum\Core\Security\TokenInterface');
+        $notifyToken = m::mock('Payum\Core\Security\TokenInterface');
         $details = new ArrayObject([]);
+        $targetUrl = 'foo.target_url';
+        $gatewayName = 'foo.gateway_name';
+        $hash = 'foo.hash';
 
         /*
         |------------------------------------------------------------
-        | Expectation
+        | Act
         |------------------------------------------------------------
         */
-
-        $gateway
-            ->shouldReceive('execute')->with(m::type('PayumTW\Mypay\Request\Api\CreateTransaction'))->once();
 
         $request
-            ->shouldReceive('getModel')->twice()->andReturn($details)
-            ->shouldReceive('getToken')->once()->andReturn($token);
+            ->shouldReceive('getModel')->andReturn($details)
+            ->shouldReceive('getToken')->andReturn($token);
 
         $token
-            ->shouldReceive('getTargetUrl')->once()->andReturn('fooMerchanturl')
-            ->shouldReceive('getGatewayName')->once()->andReturn('fooGatewayName')
-            ->shouldReceive('getDetails')->once()->andReturn([
-                'foo' => 'bar',
-            ]);
-
-        $notifyToken
-            ->shouldReceive('getHash')->once()->andReturn('fooHash');
+            ->shouldReceive('getTargetUrl')->andReturn($targetUrl)
+            ->shouldReceive('getGatewayName')->andReturn($gatewayName)
+            ->shouldReceive('getDetails')->andReturn($details);
 
         $tokenFactory
-            ->shouldReceive('createNotifyToken')->once()->andReturn($notifyToken);
+            ->shouldReceive('createNotifyToken')->with($gatewayName, $details)->andReturn($notifyToken);
 
-        /*
-        |------------------------------------------------------------
-        | Assertion
-        |------------------------------------------------------------
-        */
+        $notifyToken
+            ->shouldReceive('getHash')->andReturn($hash);
 
+        $action = new CaptureAction();
+        $action->setApi($api);
         $action->setGateway($gateway);
         $action->setGenericTokenFactory($tokenFactory);
         $action->execute($request);
+
+        /*
+        |------------------------------------------------------------
+        | Assert
+        |------------------------------------------------------------
+        */
+
+        $request->shouldHaveReceived('getModel')->twice();
+        $gateway->shouldHaveReceived('execute')->with(m::type('Payum\Core\Request\GetHttpRequest'))->once();
+        $request->shouldHaveReceived('getToken')->once();
+        $token->shouldHaveReceived('getTargetUrl')->once();
+        $token->shouldHaveReceived('getGatewayName')->once();
+        $token->shouldHaveReceived('getDetails')->once();
+        $tokenFactory->shouldHaveReceived('createNotifyToken')->once();
+        $notifyToken->shouldHaveReceived('getHash')->once();
+        $gateway->shouldHaveReceived('execute')->with(m::type('PayumTW\Mypay\Request\Api\CreateTransaction'))->once();
     }
 
-    public function test_mypay_response()
+    public function test_captured_success()
     {
         /*
         |------------------------------------------------------------
-        | Set
+        | Arrange
         |------------------------------------------------------------
         */
 
-        $action = new CaptureAction();
-        $gateway = m::mock('Payum\Core\GatewayInterface');
-        $request = m::mock('Payum\Core\Request\Capture');
-        $tokenFactory = m::mock('Payum\Core\Security\GenericTokenFactoryInterface');
-        $token = m::mock('stdClass');
-        $notifyToken = m::mock('stdClass');
-        $details = new ArrayObject([
-            'uid' => 'foo.uid',
-        ]);
+        $api = m::spy('PayumTW\Mypay\Api');
+        $gateway = m::spy('Payum\Core\GatewayInterface');
+        $request = m::spy('Payum\Core\Request\Capture');
+        $tokenFactory = m::spy('Payum\Core\Security\GenericTokenFactoryInterface');
+        $details = new ArrayObject([]);
+
+        $response = [
+            'uid' => 1,
+        ];
 
         /*
         |------------------------------------------------------------
-        | Expectation
+        | Act
         |------------------------------------------------------------
         */
 
         $request
-            ->shouldReceive('getModel')->twice()->andReturn($details);
+            ->shouldReceive('getModel')->andReturn($details);
 
         $gateway
-            ->shouldReceive('execute')->with(m::type('Payum\Core\Request\Sync'))->once();
+            ->shouldReceive('execute')->with(m::type('Payum\Core\Request\GetHttpRequest'))->andReturnUsing(function($httpRequest) use ($response) {
+                $httpRequest->request = $response;
 
-        /*
-        |------------------------------------------------------------
-        | Assertion
-        |------------------------------------------------------------
-        */
+                return $httpRequest;
+            });
 
+        $api
+            ->shouldReceive('verifyHash')->with($response, $details)->andReturn(true);
+
+        $action = new CaptureAction();
+        $action->setApi($api);
         $action->setGateway($gateway);
         $action->setGenericTokenFactory($tokenFactory);
         $action->execute($request);
+
+        /*
+        |------------------------------------------------------------
+        | Assert
+        |------------------------------------------------------------
+        */
+
+        $request->shouldHaveReceived('getModel')->twice();
+        $gateway->shouldHaveReceived('execute')->with(m::type('Payum\Core\Request\GetHttpRequest'))->once();
+        $api->shouldHaveReceived('verifyHash')->with($response, $details)->once();
+    }
+
+    public function test_captured_fail()
+    {
+        /*
+        |------------------------------------------------------------
+        | Arrange
+        |------------------------------------------------------------
+        */
+
+        $api = m::spy('PayumTW\Mypay\Api');
+        $gateway = m::spy('Payum\Core\GatewayInterface');
+        $request = m::spy('Payum\Core\Request\Capture');
+        $tokenFactory = m::spy('Payum\Core\Security\GenericTokenFactoryInterface');
+        $details = new ArrayObject([]);
+
+        $response = [
+            'uid' => 1,
+        ];
+
+        /*
+        |------------------------------------------------------------
+        | Act
+        |------------------------------------------------------------
+        */
+
+        $request
+            ->shouldReceive('getModel')->andReturn($details);
+
+        $gateway
+            ->shouldReceive('execute')->with(m::type('Payum\Core\Request\GetHttpRequest'))->andReturnUsing(function($httpRequest) use ($response) {
+                $httpRequest->request = $response;
+
+                return $httpRequest;
+            });
+
+        $api
+            ->shouldReceive('verifyHash')->with($response, $details)->andReturn(false);
+
+        $action = new CaptureAction();
+        $action->setApi($api);
+        $action->setGateway($gateway);
+        $action->setGenericTokenFactory($tokenFactory);
+        $action->execute($request);
+
+        /*
+        |------------------------------------------------------------
+        | Assert
+        |------------------------------------------------------------
+        */
+
+        $request->shouldHaveReceived('getModel')->twice();
+        $gateway->shouldHaveReceived('execute')->with(m::type('Payum\Core\Request\GetHttpRequest'))->once();
+        $api->shouldHaveReceived('verifyHash')->with($response, $details)->once();
     }
 }
