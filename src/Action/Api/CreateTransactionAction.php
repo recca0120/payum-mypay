@@ -24,7 +24,9 @@ class CreateTransactionAction extends BaseApiAwareAction
         $result = $this->api->createTransaction((array) $details);
 
         if (isset($result['url']) === false) {
-            throw new LogicException("Response content is not valid json: \n\n".json_encode($result));
+            throw new LogicException("Response content is not valid json: \n\n".urldecode(json_encode(array_map(function ($data) {
+                return is_string($data) === true ? urlencode($data) : $data;
+            }, $result))));
         } else {
             $details->replace($result);
             throw new HttpRedirect($details['url']);

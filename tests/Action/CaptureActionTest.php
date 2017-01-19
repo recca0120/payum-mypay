@@ -102,7 +102,7 @@ class CaptureActionTest extends PHPUnit_Framework_TestCase
             ->shouldReceive('getModel')->andReturn($details);
 
         $gateway
-            ->shouldReceive('execute')->with(m::type('Payum\Core\Request\GetHttpRequest'))->andReturnUsing(function($httpRequest) use ($response) {
+            ->shouldReceive('execute')->with(m::type('Payum\Core\Request\GetHttpRequest'))->andReturnUsing(function ($httpRequest) use ($response) {
                 $httpRequest->request = $response;
 
                 return $httpRequest;
@@ -156,7 +156,7 @@ class CaptureActionTest extends PHPUnit_Framework_TestCase
             ->shouldReceive('getModel')->andReturn($details);
 
         $gateway
-            ->shouldReceive('execute')->with(m::type('Payum\Core\Request\GetHttpRequest'))->andReturnUsing(function($httpRequest) use ($response) {
+            ->shouldReceive('execute')->with(m::type('Payum\Core\Request\GetHttpRequest'))->andReturnUsing(function ($httpRequest) use ($response) {
                 $httpRequest->request = $response;
 
                 return $httpRequest;
