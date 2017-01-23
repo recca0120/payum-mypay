@@ -23,7 +23,7 @@ class CreateTransactionActionTest extends PHPUnit_Framework_TestCase
         $api = m::spy('PayumTW\Mypay\Api');
         $request = m::spy('PayumTW\Mypay\Request\Api\CreateTransaction');
         $details = new ArrayObject([
-            'url' => 'foo.url'
+            'url' => 'foo.url',
         ]);
 
         /*

@@ -3,12 +3,12 @@
 namespace PayumTW\Mypay\Action;
 
 use PayumTW\Mypay\Api;
+use Payum\Core\Request\Sync;
 use Payum\Core\Request\Capture;
 use Payum\Core\GatewayAwareTrait;
 use Payum\Core\GatewayAwareInterface;
 use Payum\Core\Action\ActionInterface;
 use Payum\Core\Bridge\Spl\ArrayObject;
-use Payum\Core\Request\GetHttpRequest;
 use PayumTW\Mypay\Action\Api\BaseApiAwareAction;
 use PayumTW\Mypay\Request\Api\CreateTransaction;
 use Payum\Core\Exception\RequestNotSupportedException;
@@ -30,21 +30,15 @@ class CaptureAction extends BaseApiAwareAction implements ActionInterface, Gatew
         RequestNotSupportedException::assertSupports($this, $request);
         $details = ArrayObject::ensureArrayObject($request->getModel());
 
-        $httpRequest = new GetHttpRequest();
-        $this->gateway->execute($httpRequest);
-
-        if (isset($httpRequest->request['uid']) === true) {
-            if ($this->api->verifyHash($httpRequest->request, $details) === false) {
-                $httpRequest->request['code'] = '290';
-            }
-            $details->replace($httpRequest->request);
+        if (isset($details['uid']) === true) {
+            $this->gateway->execute(new Sync($details));
 
             return;
         }
 
         $token = $request->getToken();
-
         $targetUrl = $token->getTargetUrl();
+
         if (empty($details['success_returl']) === true) {
             $details['success_returl'] = $targetUrl;
         }

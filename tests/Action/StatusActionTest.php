@@ -13,198 +13,99 @@ class StatusActionTest extends PHPUnit_Framework_TestCase
 
     public function test_request_mark_new()
     {
-        /*
-        |------------------------------------------------------------
-        | Set
-        |------------------------------------------------------------
-        */
-
-        $action = new StatusAction();
-        $request = m::mock('Payum\Core\Request\GetStatusInterface');
-        $details = new ArrayObject();
-
-        /*
-        |------------------------------------------------------------
-        | Expectation
-        |------------------------------------------------------------
-        */
-
-        $request
-            ->shouldReceive('getModel')->andReturn($details)->twice()
-            ->shouldReceive('markNew')->once();
-
-        /*
-        |------------------------------------------------------------
-        | Assertion
-        |------------------------------------------------------------
-        */
-
-        $action->execute($request);
+        $this->validate([
+        ], 'markNew');
     }
 
     public function test_request_mark_captured()
     {
-        /*
-        |------------------------------------------------------------
-        | Set
-        |------------------------------------------------------------
-        */
-
-        $action = new StatusAction();
-        $request = m::mock('Payum\Core\Request\GetStatusInterface');
-        $details = new ArrayObject([
+        $this->validate([
             'prc' => '250',
-        ]);
+        ], 'markCaptured');
 
-        /*
-        |------------------------------------------------------------
-        | Expectation
-        |------------------------------------------------------------
-        */
-
-        $request
-            ->shouldReceive('getModel')->andReturn($details)->twice()
-            ->shouldReceive('markCaptured')->once();
-
-        /*
-        |------------------------------------------------------------
-        | Assertion
-        |------------------------------------------------------------
-        */
-
-        $action->execute($request);
+        $this->validate([
+            'code' => '250',
+        ], 'markCaptured');
     }
 
     public function test_request_mark_pending()
     {
-        /*
-        |------------------------------------------------------------
-        | Set
-        |------------------------------------------------------------
-        */
-
-        $action = new StatusAction();
-        $request = m::mock('Payum\Core\Request\GetStatusInterface');
-        $details = new ArrayObject([
+        $this->validate([
             'prc' => '260',
-        ]);
+        ], 'markPending');
 
-        /*
-        |------------------------------------------------------------
-        | Expectation
-        |------------------------------------------------------------
-        */
-
-        $request
-            ->shouldReceive('getModel')->andReturn($details)->twice()
-            ->shouldReceive('markPending')->once();
-
-        /*
-        |------------------------------------------------------------
-        | Assertion
-        |------------------------------------------------------------
-        */
-
-        $action->execute($request);
+        $this->validate([
+            'code' => '260',
+        ], 'markPending');
     }
 
     public function test_request_mark_expired()
     {
-        /*
-        |------------------------------------------------------------
-        | Set
-        |------------------------------------------------------------
-        */
-
-        $action = new StatusAction();
-        $request = m::mock('Payum\Core\Request\GetStatusInterface');
-        $details = new ArrayObject([
+        $this->validate([
             'prc' => '380',
-        ]);
+        ], 'markExpired');
 
-        /*
-        |------------------------------------------------------------
-        | Expectation
-        |------------------------------------------------------------
-        */
-
-        $request
-            ->shouldReceive('getModel')->andReturn($details)->twice()
-            ->shouldReceive('markExpired')->once();
-
-        /*
-        |------------------------------------------------------------
-        | Assertion
-        |------------------------------------------------------------
-        */
-
-        $action->execute($request);
+        $this->validate([
+            'code' => '380',
+        ], 'markExpired');
     }
 
     public function test_request_mark_failed()
     {
-        /*
-        |------------------------------------------------------------
-        | Set
-        |------------------------------------------------------------
-        */
-
-        $action = new StatusAction();
-        $request = m::mock('Payum\Core\Request\GetStatusInterface');
-        $details = new ArrayObject([
+        $this->validate([
             'prc' => '-1',
-        ]);
+        ], 'markFailed');
 
-        /*
-        |------------------------------------------------------------
-        | Expectation
-        |------------------------------------------------------------
-        */
+        $this->validate([
+            'code' => '-1',
+        ], 'markFailed');
 
-        $request
-            ->shouldReceive('getModel')->andReturn($details)->twice()
-            ->shouldReceive('markFailed')->once();
+        $this->validate([
+            'prc' => '400',
+        ], 'markFailed');
 
-        /*
-        |------------------------------------------------------------
-        | Assertion
-        |------------------------------------------------------------
-        */
-
-        $action->execute($request);
+        $this->validate([
+            'code' => '400',
+        ], 'markFailed');
     }
 
     public function test_request_syscode_mark_failed()
     {
-        /*
-        |------------------------------------------------------------
-        | Set
-        |------------------------------------------------------------
-        */
-
-        $action = new StatusAction();
-        $request = m::mock('Payum\Core\Request\GetStatusInterface');
-        $details = new ArrayObject([
+        $this->validate([
             'SysCode' => '-1',
             'ResultCode' => '100',
-        ]);
+        ], 'markFailed');
+    }
 
+    protected function validate($input, $type)
+    {
         /*
         |------------------------------------------------------------
-        | Expectation
+        | Arrange
         |------------------------------------------------------------
         */
 
-        $request
-            ->shouldReceive('getModel')->andReturn($details)->twice()
-            ->shouldReceive('markFailed')->once();
+        $request = m::spy('Payum\Core\Request\GetStatusInterface');
+        $details = new ArrayObject($input);
 
         /*
         |------------------------------------------------------------
-        | Assertion
+        | Act
         |------------------------------------------------------------
         */
 
+        $request->shouldReceive('getModel')->andReturn($details);
+
+        $action = new StatusAction();
         $action->execute($request);
+
+        /*
+        |------------------------------------------------------------
+        | Assert
+        |------------------------------------------------------------
+        */
+
+        $request->shouldHaveReceived('getModel')->twice();
+        $request->shouldHaveReceived($type)->once();
     }
 }
