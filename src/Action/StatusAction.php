@@ -20,12 +20,19 @@ class StatusAction implements ActionInterface
 
         $details = ArrayObject::ensureArrayObject($request->getModel());
 
+        $code = null;
         if (isset($details['prc']) === true) {
+            $code = $details['prc'];
+        } else if (isset($details['code']) === true) {
+            $code = $details['code'];
+        }
+
+        if (is_null($code) === false) {
 
             /*
              * 290 交易成功，但資訊不符  交易成功，但資訊不符(包含金額、已逾期...等)
              */
-            if (in_array($details['prc'], ['250', '600', '290'], true) === true) {
+            if (in_array($code, ['250', '290', '600'], true) === true) {
                 $request->markCaptured();
 
                 return;
@@ -34,13 +41,13 @@ class StatusAction implements ActionInterface
             /*
              * 280 儲值/WEBATM­線上待付款，但需要等到使用者線上確認交易
              */
-            if (in_array($details['prc'], ['260', '270', '280', 'A0002'], true) === true) {
+            if (in_array($code, ['200', '260', '270', '280', 'A0002'], true) === true) {
                 $request->markPending();
 
                 return;
             }
 
-            if ($details['prc'] === '380') {
+            if ($code === '380') {
                 $request->markExpired();
 
                 return;
