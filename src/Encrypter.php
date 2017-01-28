@@ -31,7 +31,7 @@ class Encrypter
     public function __construct($key, AES $cipher = null)
     {
         $this->key = $key;
-        $this->cipher = is_null($cipher) === true ? new AES(AES::MODE_CBC) : $cipher;
+        $this->cipher = $cipher ?: new AES(AES::MODE_CBC);
     }
 
     /**

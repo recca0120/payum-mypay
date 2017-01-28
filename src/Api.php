@@ -59,7 +59,7 @@ class Api
         $this->options = $options;
         $this->client = $client;
         $this->messageFactory = $messageFactory;
-        $this->encrypter = is_null($encrypter) === true ? new Encrypter($this->options['key']) : $encrypter;
+        $this->encrypter = $encrypter ?: new Encrypter($this->options['key']);
     }
 
     /**
