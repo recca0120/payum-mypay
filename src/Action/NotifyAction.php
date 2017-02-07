@@ -29,7 +29,7 @@ class NotifyAction extends BaseApiAwareAction implements ActionInterface, Gatewa
         $httpRequest = new GetHttpRequest();
         $this->gateway->execute($httpRequest);
 
-        if ($this->api->verifyHash($httpRequest->request, $details) === false) {
+        if ($this->api->verifyHash($httpRequest->request, (array) $details) === false) {
             throw new HttpResponse('key verify fail.', 400, ['Content-Type' => 'text/plain']);
         }
 

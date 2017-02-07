@@ -1,54 +1,34 @@
 <?php
 
+namespace PayumTW\Mypay\Tests;
+
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Payum\Core\Bridge\Spl\ArrayObject;
 use PayumTW\Mypay\MypayGatewayFactory;
 
-class MypayGatewayFactoryTest extends PHPUnit_Framework_TestCase
+class MypayGatewayFactoryTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }
 
-    public function test_create_factory()
+    public function testCreateConfig()
     {
-        /*
-        |------------------------------------------------------------
-        | Arrange
-        |------------------------------------------------------------
-        */
-
-        $httpClient = m::spy('Payum\Core\HttpClientInterface');
-        $message = m::spy('Http\Message\MessageFactory');
-
-        /*
-        |------------------------------------------------------------
-        | Act
-        |------------------------------------------------------------
-        */
-
         $gateway = new MypayGatewayFactory();
         $config = $gateway->createConfig([
-            'payum.api' => false,
-            'payum.required_options' => [],
-            'payum.http_client' => $httpClient,
-            'httplug.message_factory' => $message,
-            'store_uid' => md5(rand()),
-            'key' => md5(rand()),
+            'payum.http_client' => $httpClient = m::mock('Payum\Core\HttpClientInterface'),
+            'httplug.message_factory' => $messageFactory = m::mock('Http\Message\MessageFactory'),
+            'store_uid' => $storeUid = md5(rand()),
+            'key' => $key = md5(rand()),
             'ip' => '::1',
             'server' => [],
             'sandbox' => true,
         ]);
-
-        $api = call_user_func($config['payum.api'], ArrayObject::ensureArrayObject($config));
-
-        /*
-        |------------------------------------------------------------
-        | Assert
-        |------------------------------------------------------------
-        */
-
-        $this->assertInstanceOf('PayumTW\Mypay\Api', $api);
+        $this->assertInstanceOf(
+            'PayumTW\Mypay\Api',
+            $config['payum.api'](ArrayObject::ensureArrayObject($config))
+        );
     }
 }

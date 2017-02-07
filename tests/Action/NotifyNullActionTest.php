@@ -1,52 +1,34 @@
 <?php
 
+namespace PayumTW\Mypay\Tests\Action;
+
 use Mockery as m;
 use PayumTW\Mypay\Api;
+use Payum\Core\Request\Notify;
+use PHPUnit\Framework\TestCase;
 use PayumTW\Mypay\Action\NotifyNullAction;
 
-class NotifyNullActionTest extends PHPUnit_Framework_TestCase
+class NotifyNullActionTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }
 
-    public function test_notify_execute()
+    public function testExecute()
     {
-        /*
-        |------------------------------------------------------------
-        | Set
-        |------------------------------------------------------------
-        */
-
         $action = new NotifyNullAction();
-        $gateway = m::mock('Payum\Core\GatewayInterface');
-        $request = m::mock('Payum\Core\Request\Notify');
+        $request = new Notify(null);
+        $action->setGateway(
+            $gateway = m::mock('Payum\Core\GatewayInterface')
+        );
+        $gateway->shouldReceive('execute')->once()->with(m::type('Payum\Core\Request\GetHttpRequest'))->andReturnUsing(function ($getHttpRequest) {
+            $getHttpRequest->request = [Api::NOTIFY_TOKEN_FIELD => 'key'];
 
-        /*
-        |------------------------------------------------------------
-        | Expectation
-        |------------------------------------------------------------
-        */
-
-        $gateway
-            ->shouldReceive('execute')->with(m::type('Payum\Core\Request\GetHttpRequest'))->once()->andReturnUsing(function ($request) {
-                $request->request[Api::NOTIFY_TOKEN_FIELD] = 'fooTokenField';
-
-                return $request;
-            })
-            ->shouldReceive('execute')->with(m::type('Payum\Core\Request\GetToken'))->once()
-            ->shouldReceive('execute')->with(m::type('Payum\Core\Request\Notify'))->once();
-
-        $request->shouldReceive('getModel')->once()->andReturnNull();
-
-        /*
-        |------------------------------------------------------------
-        | Assertion
-        |------------------------------------------------------------
-        */
-
-        $action->setGateway($gateway);
+            return $getHttpRequest;
+        });
+        $gateway->shouldReceive('execute')->once()->with(m::type('Payum\Core\Request\GetToken'));
+        $gateway->shouldReceive('execute')->once()->with(m::type('Payum\Core\Request\Notify'));
         $action->execute($request);
     }
 }

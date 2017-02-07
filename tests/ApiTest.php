@@ -1,213 +1,171 @@
 <?php
 
+namespace PayumTW\Mypay\Tests;
+
 use Mockery as m;
 use PayumTW\Mypay\Api;
+use PHPUnit\Framework\TestCase;
 
-class ApiTest extends PHPUnit_Framework_TestCase
+class ApiTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }
 
-    public function test_production_endpoint()
+    public function testGetApiEndpoint()
     {
-        /*
-        |------------------------------------------------------------
-        | Set
-        |------------------------------------------------------------
-        */
-
-        $httpClient = m::mock('Payum\Core\HttpClientInterface');
-        $message = m::mock('Http\Message\MessageFactory');
-        $request = m::mock('Psr\Http\Message\RequestInterface');
-        $response = m::mock('stdClass');
-        $options = [
-            'store_uid' => '123',
-            'key' => md5(rand()),
-            'ip' => '::1',
-            'sandbox' => false,
-        ];
-        $api = new Api($options, $httpClient, $message);
-
-        /*
-        |------------------------------------------------------------
-        | Expectation
-        |------------------------------------------------------------
-        */
-
-        /*
-        |------------------------------------------------------------
-        | Assertion
-        |------------------------------------------------------------
-        */
+        $api = new Api(
+            $options = ['sandbox' => false, 'key' => md5(rand())],
+            $httpClient = m::mock('Payum\Core\HttpClientInterface'),
+            $messageFactory = m::mock('Http\Message\MessageFactory'),
+            $encrypter = m::mock('PayumTW\Mypay\Encrypter')
+        );
         $this->assertSame('https://mypay.tw/api/init', $api->getApiEndpoint());
-    }
 
-    public function test_sand_endpoint()
-    {
-        /*
-        |------------------------------------------------------------
-        | Set
-        |------------------------------------------------------------
-        */
-
-        $httpClient = m::mock('Payum\Core\HttpClientInterface');
-        $message = m::mock('Http\Message\MessageFactory');
-        $request = m::mock('Psr\Http\Message\RequestInterface');
-        $response = m::mock('stdClass');
-        $options = [
-            'store_uid' => '123',
-            'key' => md5(rand()),
-            'ip' => '::1',
-            'sandbox' => true,
-        ];
-        $api = new Api($options, $httpClient, $message);
-
-        /*
-        |------------------------------------------------------------
-        | Expectation
-        |------------------------------------------------------------
-        */
-
-        /*
-        |------------------------------------------------------------
-        | Assertion
-        |------------------------------------------------------------
-        */
+        $api = new Api(
+            $options = ['sandbox' => true, 'key' => md5(rand())],
+            $httpClient = m::mock('Payum\Core\HttpClientInterface'),
+            $messageFactory = m::mock('Http\Message\MessageFactory'),
+            $encrypter = m::mock('PayumTW\Mypay\Encrypter')
+        );
         $this->assertSame('https://pay.usecase.cc/api/init', $api->getApiEndpoint());
     }
 
-    public function test_create_transaction()
+    public function testCreateTransaction()
     {
-        /*
-        |------------------------------------------------------------
-        | Set
-        |------------------------------------------------------------
-        */
-
-        $httpClient = m::mock('Payum\Core\HttpClientInterface');
-        $message = m::mock('Http\Message\MessageFactory');
-        $request = m::mock('Psr\Http\Message\RequestInterface');
-        $encrypter = m::mock('PayumTW\Mypay\Encrypter');
-        $response = m::mock('Psr\Http\Message\ResponseInterface');
-        $options = [
-            'store_uid' => '123',
-            'key' => md5(rand()),
-            'ip' => '::1',
-            'sandbox' => true,
-        ];
+        $api = new Api(
+            $options = [
+                'store_uid' => $storeUid = '123',
+                'key' => $key = md5(rand()),
+                'ip' => $ip = '::1',
+                'sandbox' => true,
+            ],
+            $httpClient = m::mock('Payum\Core\HttpClientInterface'),
+            $messageFactory = m::mock('Http\Message\MessageFactory'),
+            $encrypter = m::mock('PayumTW\Mypay\Encrypter')
+        );
 
         $params = [
-            'user_id' => 'phper',
-            'item' => 1,
+            'user_id' => $userId = 'phper',
+            'item' => $count = 1,
             'items' => [
                 [
-                    'id' => '0886449',
-                    'name' => '商品名稱',
-                    'cost' => 10,
-                    'amount' => '1',
-                    'total' => 10,
+                    'id' => $itemId = '0886449',
+                    'name' => $itemName = '商品名稱',
+                    'price' => $cost = 10,
+                    'quantity' => $quantity = 1,
+                    'total' => $total = 10,
                 ],
             ],
-            'order_id' => '1234567890',
-            'ip' => '::1',
+            'order_id' => $orderId = '1234567890',
         ];
 
-        $apiParams = json_encode([
-            'service_name' => 'api',
-            'cmd' => 'api/orders',
-        ]);
+        $encrypter->shouldReceive('encrypt')->once()->with(json_encode(['service_name' => 'api', 'cmd' => 'api/orders']))->andReturn($service = 'foo');
+        $encrypter->shouldReceive('encrypt')->once()->with(json_encode([
+            'store_uid' => $storeUid,
+            'user_id' => $userId,
+            'cost' => 10,
+            'order_id' => $orderId,
+            'ip' => $ip,
+            'item' => $count,
+            'pfn' => 'CREDITCARD',
+            'i_0_id' => $itemId,
+            'i_0_name' => $itemName,
+            'i_0_cost' => $cost,
+            'i_0_amount' => $quantity,
+            'i_0_total' => $total,
+        ]))->andReturn($encryData = 'foo');
 
-        $postData = [
-            'store_uid' => $options['store_uid'],
-            'service' => 'foo.api-params',
-            'encry_data' => 'foo.encrypt',
-        ];
+        $messageFactory->shouldReceive('createRequest')->once()->with(
+            'POST',
+            $api->getApiEndpoint(),
+            [
+                'Content-Type' => 'application/x-www-form-urlencoded',
+            ],
+            http_build_query([
+                'store_uid' => $storeUid,
+                'service' => $service,
+                'encry_data' => $encryData,
+            ])
+        )->andReturn(
+            $request = m::mock('Psr\Http\Message\RequestInterface')
+        );
 
-        /*
-        |------------------------------------------------------------
-        | Expectation
-        |------------------------------------------------------------
-        */
+        $httpClient->shouldReceive('send')->once()->with($request)->andReturn(
+            $response = m::mock('Psr\Http\Message\ResponseInterface')
+        );
 
-        $encrypter
-            ->shouldReceive('encrypt')->with($apiParams)->once()->andReturn('foo.api-params')
-            ->shouldReceive('encrypt')->once()->andReturn('foo.encrypt');
+        $response->shouldReceive('getStatusCode')->once()->andReturn(200);
+        $response->shouldReceive('getBody->getContents')->andReturn(
+            json_encode($content = ['foo' => 'bar'])
+        );
 
-        $message->shouldReceive('createRequest')->andReturn($request);
-
-        $httpClient->shouldReceive('send')->andReturn($response);
-
-        $response
-            ->shouldReceive('getStatusCode')->andReturn(200)
-            ->shouldReceive('getBody->getContents')->andReturn(json_encode(['foo' => 'bar']));
-
-        /*
-        |------------------------------------------------------------
-        | Assertion
-        |------------------------------------------------------------
-        */
-
-        $api = new Api($options, $httpClient, $message, $encrypter);
-        $result = $api->createTransaction($params);
+        $this->assertSame($content, $api->createTransaction($params));
     }
 
-    public function test_get_transaction_data()
+    public function testGetTransactionData()
     {
-        /*
-        |------------------------------------------------------------
-        | Set
-        |------------------------------------------------------------
-        */
-
-        $httpClient = m::mock('Payum\Core\HttpClientInterface');
-        $message = m::mock('Http\Message\MessageFactory');
-        $request = m::mock('Psr\Http\Message\RequestInterface');
-        $encrypter = m::mock('PayumTW\Mypay\Encrypter');
-        $response = m::mock('Psr\Http\Message\ResponseInterface');
-        $options = [
-            'store_uid' => '123',
-            'key' => md5(rand()),
-            'ip' => '::1',
-            'sandbox' => true,
-        ];
+        $api = new Api(
+            $options = [
+                'store_uid' => $storeUid = '123',
+                'key' => $key = md5(rand()),
+                'ip' => $ip = '::1',
+                'sandbox' => true,
+            ],
+            $httpClient = m::mock('Payum\Core\HttpClientInterface'),
+            $messageFactory = m::mock('Http\Message\MessageFactory'),
+            $encrypter = m::mock('PayumTW\Mypay\Encrypter')
+        );
 
         $params = [
-            'key' => md5(rand()),
-            'uid' => md5(rand()),
+            'uid' => $uid = md5(rand()),
+            'key' => $key = md5(rand()),
         ];
 
-        $apiParams = json_encode([
-            'service_name' => 'api',
-            'cmd' => 'api/queryorder',
-        ]);
+        $encrypter->shouldReceive('encrypt')->once()->with(json_encode(['service_name' => 'api', 'cmd' => 'api/queryorder']))->andReturn($service = 'foo');
+        $encrypter->shouldReceive('encrypt')->once()->with(json_encode($params))->andReturn($encryData = 'foo');
 
-        /*
-        |------------------------------------------------------------
-        | Expectation
-        |------------------------------------------------------------
-        */
+        $messageFactory->shouldReceive('createRequest')->once()->with(
+            'POST',
+            $api->getApiEndpoint(),
+            [
+                'Content-Type' => 'application/x-www-form-urlencoded',
+            ],
+            http_build_query([
+                'store_uid' => $storeUid,
+                'service' => $service,
+                'encry_data' => $encryData,
+            ])
+        )->andReturn(
+            $request = m::mock('Psr\Http\Message\RequestInterface')
+        );
 
-        $encrypter
-            ->shouldReceive('encrypt')->with($apiParams)->once()->andReturn('foo.api-params')
-            ->shouldReceive('encrypt')->once()->andReturn('foo.encrypt');
+        $httpClient->shouldReceive('send')->once()->with($request)->andReturn(
+            $response = m::mock('Psr\Http\Message\ResponseInterface')
+        );
 
-        $message->shouldReceive('createRequest')->andReturn($request);
+        $response->shouldReceive('getStatusCode')->once()->andReturn(200);
+        $response->shouldReceive('getBody->getContents')->andReturn(
+            json_encode($content = ['foo' => 'bar'])
+        );
 
-        $httpClient->shouldReceive('send')->andReturn($response);
+        $this->assertSame($content, $api->getTransactionData($params));
+    }
 
-        $response
-            ->shouldReceive('getStatusCode')->andReturn(200)
-            ->shouldReceive('getBody->getContents')->andReturn(json_encode(['foo' => 'bar']));
-
-        /*
-        |------------------------------------------------------------
-        | Assertion
-        |------------------------------------------------------------
-        */
-
-        $api = new Api($options, $httpClient, $message, $encrypter);
-        $result = $api->getTransactionData($params);
+    public function testVerifyHash()
+    {
+        $api = new Api(
+            $options = [
+                'store_uid' => $storeUid = '123',
+                'key' => $key = md5(rand()),
+                'ip' => $ip = '::1',
+                'sandbox' => true,
+            ],
+            $httpClient = m::mock('Payum\Core\HttpClientInterface'),
+            $messageFactory = m::mock('Http\Message\MessageFactory'),
+            $encrypter = m::mock('PayumTW\Mypay\Encrypter')
+        );
+        $this->assertTrue($api->verifyHash(['key' => 'key'], ['key' => 'key']));
     }
 }

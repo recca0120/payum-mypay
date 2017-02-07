@@ -69,15 +69,14 @@ class Api
      */
     protected function doRequest(array $fields)
     {
-        $headers = [
+        $request = $this->messageFactory->createRequest('POST', $this->getApiEndpoint(), [
             'Content-Type' => 'application/x-www-form-urlencoded',
-        ];
-
-        $request = $this->messageFactory->createRequest('POST', $this->getApiEndpoint(), $headers, http_build_query($fields));
+        ], http_build_query($fields));
 
         $response = $this->client->send($request);
 
-        if (false == ($response->getStatusCode() >= 200 && $response->getStatusCode() < 300)) {
+        $statusCode = $response->getStatusCode();
+        if (false == ($statusCode >= 200 && $statusCode < 300)) {
             throw HttpException::factory($request, $response);
         }
 
@@ -214,9 +213,7 @@ class Api
             array_intersect_key($params, $supportedParams)
         ));
 
-        $result = $this->call($params, 'api/orders');
-
-        return $result;
+        return $this->call($params, 'api/orders');
     }
 
     /**
@@ -263,16 +260,14 @@ class Api
      */
     protected function call($params, $cmd)
     {
-        $postData = [
+        return $this->doRequest([
             'store_uid' => $this->options['store_uid'],
             'service' => $this->calculateHash([
                 'service_name' => 'api',
                 'cmd' => $cmd,
             ]),
             'encry_data' => $this->calculateHash($params),
-        ];
-
-        return $this->doRequest($postData);
+        ]);
     }
 
     /**

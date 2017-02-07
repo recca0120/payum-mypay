@@ -1,25 +1,23 @@
 <?php
 
+namespace PayumTW\Mypay\Tests;
+
 use Mockery as m;
 use PayumTW\Mypay\Encrypter;
+use PHPUnit\Framework\TestCase;
 
-class EncrypterTest extends PHPUnit_Framework_TestCase
+class EncrypterTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }
 
-    public function test_encrypt()
+    public function testEncryptAndDecrypt()
     {
-        /*
-        |------------------------------------------------------------
-        | Arrange
-        |------------------------------------------------------------
-        */
-
-        $key = md5(rand());
-        $params = [
+        $encrypter = new Encrypter($key = md5(rand()));
+        $encrypter->setKey($key);
+        $encrypt = $encrypter->encrypt(json_encode($params = [
             'item' => 1,
             'items' => [
                 [
@@ -33,24 +31,7 @@ class EncrypterTest extends PHPUnit_Framework_TestCase
             'user_id' => 'phper',
             'order_id' => '1234567890',
             'ip' => '::1',
-        ];
-
-        /*
-        |------------------------------------------------------------
-        | Act
-        |------------------------------------------------------------
-        */
-
-        $encrypter = new Encrypter($key);
-        $encrypter->setKey($key);
-
-        /*
-        |------------------------------------------------------------
-        | Assert
-        |------------------------------------------------------------
-        */
-
-        $encrypt = $encrypter->encrypt(json_encode($params));
+        ]));
         $this->assertSame($params, json_decode($encrypter->decrypt($encrypt), true));
 
         if (version_compare(PHP_VERSION, '7.1', '<') === true) {

@@ -1,59 +1,37 @@
 <?php
 
+namespace PayumTW\Mypay\Tests\Action;
+
 use Mockery as m;
+use Payum\Core\Request\Convert;
+use PHPUnit\Framework\TestCase;
 use PayumTW\Mypay\Action\ConvertPaymentAction;
 
-class ConvertPaymentActionTest extends PHPUnit_Framework_TestCase
+class ConvertPaymentActionTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }
 
-    public function test_convert()
+    public function testExecute()
     {
-        /*
-        |------------------------------------------------------------
-        | Set
-        |------------------------------------------------------------
-        */
-
         $action = new ConvertPaymentAction();
-        $request = m::mock('Payum\Core\Request\Convert');
-        $payment = m::mock('Payum\Core\Model\PaymentInterface');
-
-        /*
-        |------------------------------------------------------------
-        | Expectation
-        |------------------------------------------------------------
-        */
-
-        $request
-            ->shouldReceive('getSource')->twice()->andReturn($payment)
-            ->shouldReceive('getTo')->once()->andReturn('array');
-
-        $payment
-            ->shouldReceive('getDetails')->andReturn([])
-            ->shouldReceive('getNumber')->andReturn('fooNumber')
-            ->shouldReceive('getClientId')->andReturn('fooClientId')
-            ->shouldReceive('getClientEmail')->andReturn('fooClientEmail')
-            ->shouldReceive('getTotalAmount')->andReturn('fooTotalAmount');
-
-        /*
-        |------------------------------------------------------------
-        | Assertion
-        |------------------------------------------------------------
-        */
-
-        $request->shouldReceive('setResult')->once()->andReturnUsing(function ($data) {
-            $this->assertSame([
-                'order_id' => 'fooNumber',
-                'user_id' => 'fooClientId',
-                'user_email' => 'fooClientEmail',
-                'cost' => 'fooTotalAmount',
-            ], $data);
-        });
-
+        $request = new Convert(
+            $payment = m::mock('Payum\Core\Model\PaymentInterface'),
+            $to = 'array'
+        );
+        $payment->shouldReceive('getDetails')->once()->andReturn([]);
+        $payment->shouldReceive('getNumber')->once()->andReturn($number = 'foo');
+        $payment->shouldReceive('getClientId')->once()->andReturn($clientId = 'foo');
+        $payment->shouldReceive('getClientEmail')->once()->andReturn($clientEmail = 'foo');
+        $payment->shouldReceive('getTotalAmount')->once()->andReturn($totalAmount = 'foo');
         $action->execute($request);
+        $this->assertSame([
+            'order_id' => $number,
+            'user_id' => $clientId,
+            'user_email' => $clientEmail,
+            'cost' => $totalAmount,
+        ], $request->getResult());
     }
 }

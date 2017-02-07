@@ -1,23 +1,26 @@
 <?php
 
+namespace PayumTW\Mypay\Tests\Action;
+
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Payum\Core\Bridge\Spl\ArrayObject;
 use PayumTW\Mypay\Action\StatusAction;
 
-class StatusActionTest extends PHPUnit_Framework_TestCase
+class StatusActionTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }
 
-    public function test_request_mark_new()
+    public function testRequestMarkNew()
     {
         $this->validate([
         ], 'markNew');
     }
 
-    public function test_request_mark_captured()
+    public function testRequestMarkCaptured()
     {
         $this->validate([
             'prc' => '250',
@@ -28,7 +31,7 @@ class StatusActionTest extends PHPUnit_Framework_TestCase
         ], 'markCaptured');
     }
 
-    public function test_request_mark_pending()
+    public function testRequestMarkPending()
     {
         $this->validate([
             'prc' => '260',
@@ -39,7 +42,7 @@ class StatusActionTest extends PHPUnit_Framework_TestCase
         ], 'markPending');
     }
 
-    public function test_request_mark_expired()
+    public function testRequestMarkExpired()
     {
         $this->validate([
             'prc' => '380',
@@ -50,7 +53,7 @@ class StatusActionTest extends PHPUnit_Framework_TestCase
         ], 'markExpired');
     }
 
-    public function test_request_mark_failed()
+    public function testRequestMarkFailed()
     {
         $this->validate([
             'prc' => '-1',
@@ -69,7 +72,7 @@ class StatusActionTest extends PHPUnit_Framework_TestCase
         ], 'markFailed');
     }
 
-    public function test_request_syscode_mark_failed()
+    public function testRequestSyscodeMarkFailed()
     {
         $this->validate([
             'SysCode' => '-1',
@@ -79,33 +82,11 @@ class StatusActionTest extends PHPUnit_Framework_TestCase
 
     protected function validate($input, $type)
     {
-        /*
-        |------------------------------------------------------------
-        | Arrange
-        |------------------------------------------------------------
-        */
-
-        $request = m::spy('Payum\Core\Request\GetStatusInterface');
-        $details = new ArrayObject($input);
-
-        /*
-        |------------------------------------------------------------
-        | Act
-        |------------------------------------------------------------
-        */
-
-        $request->shouldReceive('getModel')->andReturn($details);
-
         $action = new StatusAction();
+        $request = m::mock('Payum\Core\Request\GetStatusInterface');
+        $request->shouldReceive('getModel')->andReturn($details = new ArrayObject($input));
+        $request->shouldReceive($type)->once();
+
         $action->execute($request);
-
-        /*
-        |------------------------------------------------------------
-        | Assert
-        |------------------------------------------------------------
-        */
-
-        $request->shouldHaveReceived('getModel')->twice();
-        $request->shouldHaveReceived($type)->once();
     }
 }

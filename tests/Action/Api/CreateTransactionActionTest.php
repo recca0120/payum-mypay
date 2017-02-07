@@ -1,101 +1,47 @@
 <?php
 
+namespace PayumTW\Mypay\Tests\Action\Api;
+
 use Mockery as m;
-use Payum\Core\Reply\HttpResponse;
+use PHPUnit\Framework\TestCase;
 use Payum\Core\Bridge\Spl\ArrayObject;
+use PayumTW\Mypay\Request\Api\CreateTransaction;
 use PayumTW\Mypay\Action\Api\CreateTransactionAction;
 
-class CreateTransactionActionTest extends PHPUnit_Framework_TestCase
+class CreateTransactionActionTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }
 
-    public function test_redirect_to_mypay()
+    /**
+     * @expectedException Payum\Core\Reply\HttpRedirect
+     */
+    public function testExecute()
     {
-        /*
-        |------------------------------------------------------------
-        | Arrange
-        |------------------------------------------------------------
-        */
-
-        $api = m::spy('PayumTW\Mypay\Api');
-        $request = m::spy('PayumTW\Mypay\Request\Api\CreateTransaction');
-        $details = new ArrayObject([
-            'url' => 'foo.url',
-        ]);
-
-        /*
-        |------------------------------------------------------------
-        | Act
-        |------------------------------------------------------------
-        */
-
-        $request
-            ->shouldReceive('getModel')->twice()->andReturn($details);
-
-        $api
-            ->shouldReceive('createTransaction')->once()->andReturn($details->toUnsafeArray());
-
         $action = new CreateTransactionAction();
-        $action->setApi($api);
+        $request = new CreateTransaction($details = new ArrayObject(['foo' => 'bar']));
+        $action->setApi(
+            $api = m::mock('PayumTW\Mypay\Api')
+        );
+        $api->shouldReceive('createTransaction')->once()->with((array) $details)->andReturn(['url' => 'foo']);
 
-        /*
-        |------------------------------------------------------------
-        | Assert
-        |------------------------------------------------------------
-        */
-
-        try {
-            $action->execute($request);
-        } catch (HttpResponse $response) {
-            $this->assertInstanceOf('Payum\Core\Reply\HttpRedirect', $response);
-        }
-
-        $request->shouldHaveReceived('getModel')->twice();
-        $api->shouldHaveReceived('createTransaction')->once();
+        $action->execute($request);
     }
 
     /**
      * @expectedException LogicException
      */
-    public function test_redirect_to_mypay_fail()
+    public function testExecuteFail()
     {
-        /*
-        |------------------------------------------------------------
-        | Arrange
-        |------------------------------------------------------------
-        */
-
-        $api = m::spy('PayumTW\Mypay\Api');
-        $request = m::spy('PayumTW\Mypay\Request\Api\CreateTransaction');
-        $details = new ArrayObject([
-        ]);
-
-        /*
-        |------------------------------------------------------------
-        | Act
-        |------------------------------------------------------------
-        */
-
-        $request
-            ->shouldReceive('getModel')->twice()->andReturn($details);
-
-        $api
-            ->shouldReceive('createTransaction')->once()->andReturn($details->toUnsafeArray());
-
         $action = new CreateTransactionAction();
-        $action->setApi($api);
-
-        /*
-        |------------------------------------------------------------
-        | Assert
-        |------------------------------------------------------------
-        */
+        $request = new CreateTransaction($details = new ArrayObject(['foo' => 'bar']));
+        $action->setApi(
+            $api = m::mock('PayumTW\Mypay\Api')
+        );
+        $api->shouldReceive('createTransaction')->once()->with((array) $details)->andReturn(['foo' => 'foo']);
 
         $action->execute($request);
-        $request->shouldHaveReceived('getModel')->twice();
-        $api->shouldHaveReceived('createTransaction')->once();
     }
 }
