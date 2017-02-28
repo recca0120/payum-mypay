@@ -6,6 +6,7 @@ use Mockery as m;
 use Payum\Core\Request\Sync;
 use PHPUnit\Framework\TestCase;
 use PayumTW\Mypay\Action\SyncAction;
+use Payum\Core\Bridge\Spl\ArrayObject;
 
 class SyncActionTest extends TestCase
 {
@@ -17,7 +18,7 @@ class SyncActionTest extends TestCase
     public function testExecute()
     {
         $action = new SyncAction();
-        $request = new Sync([]);
+        $request = new Sync(new ArrayObject([]));
         $action->setGateway(
             $gateway = m::mock('Payum\Core\GatewayInterface')
         );

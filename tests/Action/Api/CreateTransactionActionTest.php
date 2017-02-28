@@ -28,6 +28,11 @@ class CreateTransactionActionTest extends TestCase
         $api->shouldReceive('createTransaction')->once()->with((array) $details)->andReturn(['url' => 'foo']);
 
         $action->execute($request);
+
+        $this->assertSame([
+            'foo' => 'bar',
+            'url' => 'foo'
+        ], (array) $request->getModel());
     }
 
     /**
@@ -43,5 +48,10 @@ class CreateTransactionActionTest extends TestCase
         $api->shouldReceive('createTransaction')->once()->with((array) $details)->andReturn(['foo' => 'foo']);
 
         $action->execute($request);
+
+        $this->assertSame([
+            'foo' => 'bar',
+            'foo' => 'foo'
+        ], (array) $request->getModel());
     }
 }

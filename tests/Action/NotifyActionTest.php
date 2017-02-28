@@ -6,6 +6,7 @@ use Mockery as m;
 use Payum\Core\Request\Notify;
 use PHPUnit\Framework\TestCase;
 use Payum\Core\Reply\ReplyInterface;
+use Payum\Core\Bridge\Spl\ArrayObject;
 use PayumTW\Mypay\Action\NotifyAction;
 
 class NotifyActionTest extends TestCase
@@ -18,7 +19,7 @@ class NotifyActionTest extends TestCase
     public function testExecute()
     {
         $action = new NotifyAction();
-        $request = new Notify(['key' => 'key']);
+        $request = new Notify(new ArrayObject(['key' => 'key']));
         $action->setGateway(
             $gateway = m::mock('Payum\Core\GatewayInterface')
         );
@@ -44,7 +45,7 @@ class NotifyActionTest extends TestCase
     public function testExecuteVerifyHashFail()
     {
         $action = new NotifyAction();
-        $request = new Notify(['key' => 'key']);
+        $request = new Notify(new ArrayObject(['key' => 'key']));
         $action->setGateway(
             $gateway = m::mock('Payum\Core\GatewayInterface')
         );

@@ -5,6 +5,7 @@ namespace PayumTW\Mypay\Tests\Action;
 use Mockery as m;
 use Payum\Core\Request\Capture;
 use PHPUnit\Framework\TestCase;
+use Payum\Core\Bridge\Spl\ArrayObject;
 use PayumTW\Mypay\Action\CaptureAction;
 
 class CaptureActionTest extends TestCase
@@ -17,7 +18,7 @@ class CaptureActionTest extends TestCase
     public function testExecute()
     {
         $action = new CaptureAction();
-        $request = m::mock(new Capture([]));
+        $request = m::mock(new Capture(new ArrayObject([])));
         $request->shouldReceive('getToken')->once()->andReturn(
             $token = m::mock('Payum\Core\Security\TokenInterface')
         );
@@ -41,7 +42,7 @@ class CaptureActionTest extends TestCase
     public function testCaptured()
     {
         $action = new CaptureAction();
-        $request = m::mock(new Capture(['uid' => 1]));
+        $request = m::mock(new Capture(new ArrayObject(['uid' => 1])));
         $action->setGateway(
             $gateway = m::mock('Payum\Core\GatewayInterface')
         );
