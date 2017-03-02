@@ -31,7 +31,7 @@ class CreateTransactionActionTest extends TestCase
 
         $this->assertSame([
             'foo' => 'bar',
-            'url' => 'foo'
+            'url' => 'foo',
         ], (array) $request->getModel());
     }
 
@@ -51,7 +51,7 @@ class CreateTransactionActionTest extends TestCase
 
         $this->assertSame([
             'foo' => 'bar',
-            'foo' => 'foo'
+            'foo' => 'foo',
         ], (array) $request->getModel());
     }
 }
