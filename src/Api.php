@@ -261,6 +261,7 @@ class Api
      * call.
      *
      * @param array $params
+     * @param string $cmd
      * @return array
      */
     protected function call($params, $cmd)

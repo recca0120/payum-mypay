@@ -112,7 +112,7 @@ class Encrypter
     /**
      * pkcs5Unpad.
      *
-     * @param string $text
+     * @param string $plaintext
      * @return string
      */
     protected function pkcs5Unpad($plaintext)
