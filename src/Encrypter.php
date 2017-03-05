@@ -9,7 +9,7 @@ class Encrypter
     /**
      * $cipher.
      *
-     * @var phpseclib\Crypt\AES
+     * @var \phpseclib\Crypt\AES
      */
     protected $cipher;
 
