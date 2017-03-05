@@ -23,10 +23,8 @@ class Encrypter
     /**
      * __construct.
      *
-     * @method __construct
-     *
      * @param string $key
-     * @param phpseclib\Crypt\AES $cipher
+     * @param \phpseclib\Crypt\AES $cipher
      */
     public function __construct($key, AES $cipher = null)
     {
@@ -37,10 +35,7 @@ class Encrypter
     /**
      * setKey.
      *
-     * @method setKey
-     *
      * @param string $key
-     *
      * @return static
      */
     public function setKey($key)
@@ -53,10 +48,7 @@ class Encrypter
     /**
      * encrypt.
      *
-     * @method encrypt
-     *
      * @param string $plaintext
-     *
      * @return string
      */
     public function encrypt($plaintext)
@@ -71,10 +63,7 @@ class Encrypter
     /**
      * decrypt.
      *
-     * @method decrypt
-     *
      * @param string $ciphertext
-     *
      * @return string
      */
     public function decrypt($ciphertext)
@@ -91,10 +80,7 @@ class Encrypter
     /**
      * encryptByPHP.
      *
-     * @method encryptByPHP
-     *
      * @param string $plaintext
-     *
      * @return string
      */
     public function encryptByPHP($plaintext)
@@ -111,10 +97,7 @@ class Encrypter
     /**
      * decryptByPHP.
      *
-     * @method decryptByPHP
-     *
      * @param string $ciphertext
-     *
      * @return string
      */
     public function decryptByPHP($ciphertext)
@@ -129,10 +112,7 @@ class Encrypter
     /**
      * pkcs5Unpad.
      *
-     * @method pkcs5Unpad
-     *
      * @param string $text
-     *
      * @return string
      */
     protected function pkcs5Unpad($plaintext)

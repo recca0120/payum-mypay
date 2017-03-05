@@ -48,6 +48,13 @@ class Api
     protected $options = [];
 
     /**
+     * $encrypter.
+     *
+     * @var Encrypter
+     */
+    protected $encrypter;
+
+    /**
      * @param array $options
      * @param HttpClientInterface $client
      * @param MessageFactory $messageFactory
@@ -64,7 +71,6 @@ class Api
 
     /**
      * @param array $fields
-     *
      * @return array
      */
     protected function doRequest(array $fields)
@@ -103,7 +109,6 @@ class Api
      * createTransaction.
      *
      * @param array $params
-     *
      * @return array
      */
     public function createTransaction(array $params)
@@ -220,7 +225,6 @@ class Api
      * getTransactionData.
      *
      * @param mixed $params
-     *
      * @return array
      */
     public function getTransactionData(array $params)
@@ -243,7 +247,6 @@ class Api
      *
      * @param array $params
      * @param array $details
-     *
      * @return bool
      */
     public function verifyHash(array $params, $details)
@@ -255,7 +258,6 @@ class Api
      * call.
      *
      * @param array $params
-     *
      * @return array
      */
     protected function call($params, $cmd)
@@ -272,7 +274,6 @@ class Api
 
     /**
      * @param array $params
-     *
      * @return string
      */
     protected function calculateHash(array $params)

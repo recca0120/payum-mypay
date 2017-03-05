@@ -22,6 +22,12 @@ use PayumTW\Mypay\Action\Api\GetTransactionDataAction;
 
 class MypayGatewayFactory extends GatewayFactory
 {
+    /**
+     * getDefaultHttpClient
+     *
+     * @param  Payum\Core\Bridge\Spl\ArrayObject|array $config [description]
+     * @return \Http\Client\HttpClient
+     */
     public function getDefaultHttpClient($config)
     {
         $classes = [
@@ -68,6 +74,12 @@ class MypayGatewayFactory extends GatewayFactory
         throw new LogicException('The httplug.message_factory could not be guessed. Install one of the following packages: php-http/guzzle6-adapter, zendframework/zend-diactoros. You can also overwrite the config option with your implementation.');
     }
 
+    /**
+     * getClientIp.
+     *
+     * @param array $server
+     * @return bool
+     */
     public function getClientIp($server)
     {
         $keys = [
