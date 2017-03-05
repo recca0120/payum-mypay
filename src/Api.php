@@ -143,13 +143,13 @@ class Api
             'order_id' => null,
             // 消費者來源 IP  必要  必要
             'ip' => $this->options['ip'],
-            // /**
-            //  * 定期定額付費，期數單位：
-            //  * W 為每週定期一次扣款；
-            //  * M 為每月定期一次扣款；
-            //  * S 為每季定期
-            //  * 一次扣款。如未使用到定期定額付費，不需傳此參數
-            //  */
+            /*sssss
+             * 定期定額付費，期數單位：
+             * W 為每週定期一次扣款；
+             * M 為每月定期一次扣款；
+             * S 為每季定期
+             * 一次扣款。如未使用到定期定額付費，不需傳此參數
+             */
             'regular' => null,
             /*
              * 總期數(如為 12 期即代入 12，如果為不限期數，請代入  0，如非定期定額付費，不需傳此參數
@@ -189,27 +189,28 @@ class Api
             }
         }
 
-        // // 名目總金額    必要
-        // 'voucher_total_price' => '',
-        // // 票券物品數    必要
-        // 'voucher_item' => '',
-        // // 票券張數     必要
-        // 'v_[n]_count' => '',
-        // // 面額     必要
-        // 'v_[n]_price' => '',
-        // // 每張票券實際交易金額    必要
-        // 'v_[n]_cost' => '',
-        // // 履約保證起始     必要
-        // 'v_[n]_assure_start' => '',
-        // // 履約保證結束     必要
-        // 'v_[n]_assure_end' => '',
-        // // 票券有效起始時間    必要
-        // 'v_[n]_validity_start' => '',
-        // // 票券有效結束時間     必要
-        // 'v_[n]_validity_end' => '',
-        // // 票券總產生張數    必要
-        // 'voucher_total_count' => '',
-
+        /*
+         * 名目總金額    必要
+         * 'voucher_total_price' => '',
+         * 票券物品數    必要
+         * 'voucher_item' => '',
+         * 票券張數     必要
+         * 'v_[n]_count' => '',
+         * 面額     必要
+         * 'v_[n]_price' => '',
+         * 每張票券實際交易金額    必要
+         * 'v_[n]_cost' => '',
+         * 履約保證起始     必要
+         * 'v_[n]_assure_start' => '',
+         * 履約保證結束     必要
+         * 'v_[n]_assure_end' => '',
+         * 票券有效起始時間    必要
+         * 'v_[n]_validity_start' => '',
+         * 票券有效結束時間     必要
+         * 'v_[n]_validity_end' => '',
+         * 票券總產生張數    必要
+         * 'voucher_total_count' => '',
+         */
         foreach ($params as $key => $value) {
             if (preg_match('/(i|v|echo)_\d+/', $key)) {
                 $supportedParams[$key] = null;
