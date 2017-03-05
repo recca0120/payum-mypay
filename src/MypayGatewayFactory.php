@@ -23,7 +23,7 @@ use PayumTW\Mypay\Action\Api\GetTransactionDataAction;
 class MypayGatewayFactory extends GatewayFactory
 {
     /**
-     * getDefaultHttpClient
+     * getDefaultHttpClient.
      *
      * @param  \Payum\Core\Bridge\Spl\ArrayObject|array $config
      * @return \Http\Client\HttpClient
