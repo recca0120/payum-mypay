@@ -8,6 +8,8 @@
 [![License](https://poser.pugx.org/payum-tw/mypay/license.svg)](https://packagist.org/packages/payum-tw/mypay)
 [![Monthly Downloads](https://poser.pugx.org/payum-tw/mypay/d/monthly)](https://packagist.org/packages/payum-tw/mypay)
 [![Daily Downloads](https://poser.pugx.org/payum-tw/mypay/d/daily)](https://packagist.org/packages/payum-tw/mypay)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/recca0120/payum-mypay/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/recca0120/payum-mypay/?branch=master)
+[![Code Coverage](https://scrutinizer-ci.com/g/recca0120/payum-mypay/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/recca0120/payum-mypay/?branch=master)
 
 The Payum extension to rapidly build new extensions.
 
