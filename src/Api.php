@@ -85,7 +85,7 @@ class Api
         $response = $this->client->send($request);
 
         $statusCode = $response->getStatusCode();
-        if (false == ($statusCode >= 200 && $statusCode < 300)) {
+        if (false === ($statusCode >= 200 && $statusCode < 300)) {
             throw HttpException::factory($request, $response);
         }
 
