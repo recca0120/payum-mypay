@@ -35,13 +35,15 @@ class Api
     const SMARTPAY = 'SMARTPAY';
 
     /**
-     * @var HttpClientInterface
+     * @var \Payum\Core\HttpClientInterface
      */
     protected $client;
+
     /**
-     * @var MessageFactory
+     * @var \Http\Message\MessageFactory
      */
     protected $messageFactory;
+
     /**
      * @var array
      */
@@ -56,8 +58,9 @@ class Api
 
     /**
      * @param array $options
-     * @param HttpClientInterface $client
-     * @param MessageFactory $messageFactory
+     * @param \Payum\Core\HttpClientInterface $client
+     * @param \Http\Message\MessageFactory $messageFactory
+     * @param Encrypter $encrypter
      *
      * @throws \Payum\Core\Exception\InvalidArgumentException if an option is invalid
      */
