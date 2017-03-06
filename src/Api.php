@@ -90,12 +90,12 @@ class Api
         }
 
         $body = $response->getBody()->getContents();
-        $result = json_decode($body, true);
-        if (null === $result) {
+        $content = json_decode($body, true);
+        if (null === $content) {
             throw new LogicException("Response content is not valid json: \n\n{$body}");
         }
 
-        return $result;
+        return $content;
     }
 
     /**
@@ -143,7 +143,9 @@ class Api
             'order_id' => null,
             // 消費者來源 IP  必要  必要
             'ip' => $this->options['ip'],
-            /*sssss
+            // 訂單內物品數  必要
+            'item' => null,
+            /*
              * 定期定額付費，期數單位：
              * W 為每週定期一次扣款；
              * M 為每月定期一次扣款；
@@ -151,12 +153,14 @@ class Api
              * 一次扣款。如未使用到定期定額付費，不需傳此參數
              */
             'regular' => null,
-            /*
-             * 總期數(如為 12 期即代入 12，如果為不限期數，請代入  0，如非定期定額付費，不需傳此參數
-             */
+            // 總期數(如為 12 期即代入 12，如果為不限期數，請代入  0，如非定期定額付費，不需傳此參數
             'regular_total' => null,
-            // 訂單內物品數  必要
-            'item' => null,
+            // 票券總產生張數
+            'voucher_total_count' => null,
+            // 物品總金額
+            'voucher_total_price '=> null,
+            // 票券物品數
+            'voucher_item' => null,
             // 預選付費方法，如 pfn=CREDITCARD 即為信用卡付 費。多種類型可用逗號隔開，其他參數請參照附錄一。  必要  必要
             'pfn' => static::CREDITCARD,
             // 交易成功後的轉址(若動態網址可以使用此方式傳遞)
@@ -165,6 +169,10 @@ class Api
             'failure_returl' => null,
             // 折價
             'discount' => null,
+            // 當pfn=CSTORECODE或 E_COLLECTION時，此為自訂有效使 用天數，否則以系統設定為預設有效天數
+            'limit_pay_days' => null,
+            // 運費,
+            'shipping_fee' => null,
         ];
 
         $supportedItemParams = ['id', 'name', 'cost', 'amount'];
@@ -189,28 +197,7 @@ class Api
             }
         }
 
-        /*
-         * 名目總金額    必要
-         * 'voucher_total_price' => '',
-         * 票券物品數    必要
-         * 'voucher_item' => '',
-         * 票券張數     必要
-         * 'v_[n]_count' => '',
-         * 面額     必要
-         * 'v_[n]_price' => '',
-         * 每張票券實際交易金額    必要
-         * 'v_[n]_cost' => '',
-         * 履約保證起始     必要
-         * 'v_[n]_assure_start' => '',
-         * 履約保證結束     必要
-         * 'v_[n]_assure_end' => '',
-         * 票券有效起始時間    必要
-         * 'v_[n]_validity_start' => '',
-         * 票券有效結束時間     必要
-         * 'v_[n]_validity_end' => '',
-         * 票券總產生張數    必要
-         * 'voucher_total_count' => '',
-         */
+        // 將 i_,v_,echo_ 開頭加入 $supportedParams
         foreach ($params as $key => $value) {
             if (preg_match('/(i|v|echo)_\d+/', $key)) {
                 $supportedParams[$key] = null;
@@ -222,13 +209,15 @@ class Api
             array_intersect_key($params, $supportedParams)
         ));
 
-        return $this->call($params, 'api/orders');
+        return $this->doRequest(
+            $this->encrypter->encryptRequest($this->options['store_uid'], $params, 'api/orders')
+        );
     }
 
     /**
      * getTransactionData.
      *
-     * @param mixed $params
+     * @param array $params
      * @return array
      */
     public function getTransactionData(array $params)
@@ -243,7 +232,9 @@ class Api
             array_intersect_key($params, $supportedParams)
         ));
 
-        return $this->call($params, 'api/queryorder');
+        return $this->doRequest(
+            $this->encrypter->encryptRequest($this->options['store_uid'], $params, 'api/queryorder')
+        );
     }
 
     /**
@@ -256,33 +247,5 @@ class Api
     public function verifyHash(array $params, $details)
     {
         return $params['key'] === $details['key'];
-    }
-
-    /**
-     * call.
-     *
-     * @param array $params
-     * @param string $cmd
-     * @return array
-     */
-    protected function call($params, $cmd)
-    {
-        return $this->doRequest([
-            'store_uid' => $this->options['store_uid'],
-            'service' => $this->calculateHash([
-                'service_name' => 'api',
-                'cmd' => $cmd,
-            ]),
-            'encry_data' => $this->calculateHash($params),
-        ]);
-    }
-
-    /**
-     * @param array $params
-     * @return string
-     */
-    protected function calculateHash(array $params)
-    {
-        return $this->encrypter->encrypt(json_encode($params));
     }
 }

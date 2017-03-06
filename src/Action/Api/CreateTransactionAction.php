@@ -21,16 +21,29 @@ class CreateTransactionAction extends BaseApiAwareAction
 
         $details = ArrayObject::ensureArrayObject($request->getModel());
 
-        $result = $this->api->createTransaction((array) $details);
+        $params = $this->api->createTransaction((array) $details);
 
-        $details->replace($result);
+        $details->replace($params);
 
-        if (isset($result['url']) === false) {
+        if (isset($params['url']) === false) {
             throw new LogicException("Response content is not valid json: \n\n".urldecode(json_encode(array_map(function ($data) {
                 return is_string($data) === true ? urlencode($data) : $data;
-            }, $result))));
+            }, $params))));
         } else {
-            throw new HttpRedirect($result['url']);
+            $map = [
+                'zh-tw' => 'zh-TW',
+                'tw' => 'zh-TW',
+                'zh-cn' => 'zh-CN',
+                'cn' => 'zh-CN',
+                'en-us' => 'en',
+                'en' => 'en',
+            ];
+            $locale = strtolower(
+                isset($details['locale']) === true ? $details['locale'] : 'zh-TW'
+            );
+            $locale = isset($map[$locale]) === true ? $map[$locale] : 'zh-TW';
+
+            throw new HttpRedirect($params['url'].'?locale='.$locale);
         }
     }
 

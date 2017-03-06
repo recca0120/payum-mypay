@@ -48,11 +48,12 @@ class Encrypter
     /**
      * encrypt.
      *
-     * @param string $plaintext
+     * @param array $params
      * @return string
      */
-    public function encrypt($plaintext)
+    public function encrypt($params)
     {
+        $plaintext = json_encode($params);
         $this->cipher->setKey($this->key);
         $result = $this->cipher->encrypt($plaintext);
         $iv = $this->cipher->encryptIV;
@@ -61,30 +62,14 @@ class Encrypter
     }
 
     /**
-     * decrypt.
-     *
-     * @param string $ciphertext
-     * @return string
-     */
-    public function decrypt($ciphertext)
-    {
-        $encryptWithIV = base64_decode($ciphertext);
-        $iv = substr($encryptWithIV, 0, 16);
-        $ciphertext = substr($encryptWithIV, 16);
-        $this->cipher->setKey($this->key);
-        $this->cipher->setIV($iv);
-
-        return $this->cipher->decrypt($ciphertext);
-    }
-
-    /**
      * encryptByPHP.
      *
-     * @param string $plaintext
+     * @param array $params
      * @return string
      */
-    public function encryptByPHP($plaintext)
+    public function encryptByPHP($params)
     {
+        $plaintext = json_encode($params);
         $size = mcrypt_get_iv_size(MCRYPT_CAST_256, MCRYPT_MODE_CBC);
         $iv = mcrypt_create_iv($size, MCRYPT_DEV_URANDOM);
         $padding = 16 - (strlen($plaintext) % 16);
@@ -95,10 +80,27 @@ class Encrypter
     }
 
     /**
+     * decrypt.
+     *
+     * @param string $ciphertext
+     * @return array
+     */
+    public function decrypt($ciphertext)
+    {
+        $encryptWithIV = base64_decode($ciphertext);
+        $iv = substr($encryptWithIV, 0, 16);
+        $ciphertext = substr($encryptWithIV, 16);
+        $this->cipher->setKey($this->key);
+        $this->cipher->setIV($iv);
+
+        return json_decode($this->cipher->decrypt($ciphertext), true);
+    }
+
+    /**
      * decryptByPHP.
      *
      * @param string $ciphertext
-     * @return string
+     * @return array
      */
     public function decryptByPHP($ciphertext)
     {
@@ -106,7 +108,33 @@ class Encrypter
         $iv = substr($encryptWithIV, 0, 16);
         $ciphertext = substr($encryptWithIV, 16);
 
-        return $this->pkcs5Unpad(mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $this->key, $ciphertext, MCRYPT_MODE_CBC, $iv));
+        return json_decode(
+            $this->pkcs5Unpad(
+                mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $this->key, $ciphertext, MCRYPT_MODE_CBC, $iv)
+            ),
+            true
+        );
+    }
+
+    /**
+     * encryptRequest.
+     *
+     * @param string $storeUid
+     * @param array $params
+     * @param string $cmd
+     * @param string $serviceName
+     * @return array
+     */
+    public function encryptRequest($storeUid, $params, $cmd = 'api/orders', $serviceName = 'api')
+    {
+        return [
+            'store_uid' => $storeUid,
+            'service' => $this->encrypt([
+                'service_name' => $serviceName,
+                'cmd' => $cmd,
+            ]),
+            'encry_data' => $this->encrypt($params),
+        ];
     }
 
     /**

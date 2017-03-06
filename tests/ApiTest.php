@@ -61,8 +61,7 @@ class ApiTest extends TestCase
             'order_id' => $orderId = '1234567890',
         ];
 
-        $encrypter->shouldReceive('encrypt')->once()->with(json_encode(['service_name' => 'api', 'cmd' => 'api/orders']))->andReturn($service = 'foo');
-        $encrypter->shouldReceive('encrypt')->once()->with(json_encode([
+        $encrypter->shouldReceive('encryptRequest')->once()->with($storeUid, [
             'store_uid' => $storeUid,
             'user_id' => $userId,
             'cost' => 10,
@@ -75,19 +74,13 @@ class ApiTest extends TestCase
             'i_0_cost' => $cost,
             'i_0_amount' => $quantity,
             'i_0_total' => $total,
-        ]))->andReturn($encryData = 'foo');
+        ], 'api/orders')->andReturn($encryptParams = ['foo' => 'bar']);
 
         $messageFactory->shouldReceive('createRequest')->once()->with(
             'POST',
             $api->getApiEndpoint(),
-            [
-                'Content-Type' => 'application/x-www-form-urlencoded',
-            ],
-            http_build_query([
-                'store_uid' => $storeUid,
-                'service' => $service,
-                'encry_data' => $encryData,
-            ])
+            ['Content-Type' => 'application/x-www-form-urlencoded'],
+            http_build_query($encryptParams)
         )->andReturn(
             $request = m::mock('Psr\Http\Message\RequestInterface')
         );
@@ -123,20 +116,13 @@ class ApiTest extends TestCase
             'key' => $key = md5(rand()),
         ];
 
-        $encrypter->shouldReceive('encrypt')->once()->with(json_encode(['service_name' => 'api', 'cmd' => 'api/queryorder']))->andReturn($service = 'foo');
-        $encrypter->shouldReceive('encrypt')->once()->with(json_encode($params))->andReturn($encryData = 'foo');
+        $encrypter->shouldReceive('encryptRequest')->once()->with($storeUid, $params, 'api/queryorder')->andReturn($encryptParams = ['foo' => 'bar']);
 
         $messageFactory->shouldReceive('createRequest')->once()->with(
             'POST',
             $api->getApiEndpoint(),
-            [
-                'Content-Type' => 'application/x-www-form-urlencoded',
-            ],
-            http_build_query([
-                'store_uid' => $storeUid,
-                'service' => $service,
-                'encry_data' => $encryData,
-            ])
+            ['Content-Type' => 'application/x-www-form-urlencoded'],
+            http_build_query($encryptParams)
         )->andReturn(
             $request = m::mock('Psr\Http\Message\RequestInterface')
         );
