@@ -30,21 +30,31 @@ class CreateTransactionAction extends BaseApiAwareAction
                 return is_string($data) === true ? urlencode($data) : $data;
             }, $params))));
         } else {
-            $map = [
-                'zh-tw' => 'zh-TW',
-                'tw' => 'zh-TW',
-                'zh-cn' => 'zh-CN',
-                'cn' => 'zh-CN',
-                'en-us' => 'en',
-                'en' => 'en',
-            ];
-            $locale = strtolower(
+            throw new HttpRedirect($params['url'].'?locale='.$this->locale(
                 isset($details['locale']) === true ? $details['locale'] : 'zh-TW'
-            );
-            $locale = isset($map[$locale]) === true ? $map[$locale] : 'zh-TW';
-
-            throw new HttpRedirect($params['url'].'?locale='.$locale);
+            ));
         }
+    }
+
+    /**
+     * locale.
+     *
+     * @param string $locale
+     * @return string
+     */
+    protected function locale($locale)
+    {
+        $map = [
+            'zh-tw' => 'zh-TW',
+            'tw' => 'zh-TW',
+            'zh-cn' => 'zh-CN',
+            'cn' => 'zh-CN',
+            'en-us' => 'en',
+            'en' => 'en',
+        ];
+        $locale = strtolower($locale);
+
+        return isset($map[$locale]) === true ? $map[$locale] : 'zh-TW';
     }
 
     /**

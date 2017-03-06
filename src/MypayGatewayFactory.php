@@ -25,7 +25,7 @@ class MypayGatewayFactory extends GatewayFactory
     /**
      * getDefaultHttpClient.
      *
-     * @param  \Payum\Core\Bridge\Spl\ArrayObject|array $config
+     * @param \Payum\Core\Bridge\Spl\ArrayObject $config
      * @return \Http\Client\HttpClient
      */
     public function getDefaultHttpClient($config)
