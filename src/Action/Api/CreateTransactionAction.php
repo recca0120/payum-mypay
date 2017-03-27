@@ -37,6 +37,16 @@ class CreateTransactionAction extends BaseApiAwareAction
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function supports($request)
+    {
+        return
+            $request instanceof CreateTransaction &&
+            $request->getModel() instanceof \ArrayAccess;
+    }
+
+    /**
      * locale.
      *
      * @param string $locale
@@ -55,15 +65,5 @@ class CreateTransactionAction extends BaseApiAwareAction
         $locale = strtolower($locale);
 
         return isset($map[$locale]) === true ? $map[$locale] : 'zh-TW';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supports($request)
-    {
-        return
-            $request instanceof CreateTransaction &&
-            $request->getModel() instanceof \ArrayAccess;
     }
 }

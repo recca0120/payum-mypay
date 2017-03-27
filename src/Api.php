@@ -73,32 +73,6 @@ class Api
     }
 
     /**
-     * @param array $fields
-     * @return array
-     */
-    protected function doRequest(array $fields)
-    {
-        $request = $this->messageFactory->createRequest('POST', $this->getApiEndpoint(), [
-            'Content-Type' => 'application/x-www-form-urlencoded',
-        ], http_build_query($fields));
-
-        $response = $this->client->send($request);
-
-        $statusCode = $response->getStatusCode();
-        if (false === ($statusCode >= 200 && $statusCode < 300)) {
-            throw HttpException::factory($request, $response);
-        }
-
-        $body = $response->getBody()->getContents();
-        $content = json_decode($body, true);
-        if (null === $content) {
-            throw new LogicException("Response content is not valid json: \n\n{$body}");
-        }
-
-        return $content;
-    }
-
-    /**
      * getApiEndpoint.
      *
      * @return string
@@ -158,7 +132,7 @@ class Api
             // 票券總產生張數
             'voucher_total_count' => null,
             // 物品總金額
-            'voucher_total_price '=> null,
+            'voucher_total_price ' => null,
             // 票券物品數
             'voucher_item' => null,
             // 預選付費方法，如 pfn=CREDITCARD 即為信用卡付 費。多種類型可用逗號隔開，其他參數請參照附錄一。  必要  必要
@@ -247,5 +221,31 @@ class Api
     public function verifyHash(array $params, $details)
     {
         return $params['key'] === $details['key'];
+    }
+
+    /**
+     * @param array $fields
+     * @return array
+     */
+    protected function doRequest(array $fields)
+    {
+        $request = $this->messageFactory->createRequest('POST', $this->getApiEndpoint(), [
+            'Content-Type' => 'application/x-www-form-urlencoded',
+        ], http_build_query($fields));
+
+        $response = $this->client->send($request);
+
+        $statusCode = $response->getStatusCode();
+        if (false === ($statusCode >= 200 && $statusCode < 300)) {
+            throw HttpException::factory($request, $response);
+        }
+
+        $body = $response->getBody()->getContents();
+        $content = json_decode($body, true);
+        if (null === $content) {
+            throw new LogicException("Response content is not valid json: \n\n{$body}");
+        }
+
+        return $content;
     }
 }
