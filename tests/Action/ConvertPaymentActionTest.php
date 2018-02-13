@@ -26,12 +26,14 @@ class ConvertPaymentActionTest extends TestCase
         $payment->shouldReceive('getClientId')->once()->andReturn($clientId = 'foo');
         $payment->shouldReceive('getClientEmail')->once()->andReturn($clientEmail = 'foo');
         $payment->shouldReceive('getTotalAmount')->once()->andReturn($totalAmount = 'foo');
+        $payment->shouldReceive('getCurrencyCode')->once()->andReturn($currenceCode = 'TWD');
         $action->execute($request);
         $this->assertSame([
             'order_id' => $number,
             'user_id' => $clientId,
             'user_email' => $clientEmail,
             'cost' => $totalAmount,
+            'currency' => $currenceCode,
         ], $request->getResult());
     }
 }

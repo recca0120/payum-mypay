@@ -87,6 +87,6 @@ class StatusActionTest extends TestCase
         $request->shouldReceive('getModel')->andReturn($details = new ArrayObject($input));
         $request->shouldReceive($type)->once();
 
-        $action->execute($request);
+        $this->assertNull($action->execute($request));
     }
 }

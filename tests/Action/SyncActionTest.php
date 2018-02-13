@@ -23,6 +23,6 @@ class SyncActionTest extends TestCase
             $gateway = m::mock('Payum\Core\GatewayInterface')
         );
         $gateway->shouldReceive('execute')->once()->with(m::type('PayumTW\Mypay\Request\Api\GetTransactionData'));
-        $action->execute($request);
+        $this->assertNull($action->execute($request));
     }
 }

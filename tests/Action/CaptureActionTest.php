@@ -36,7 +36,7 @@ class CaptureActionTest extends TestCase
             $gateway = m::mock('Payum\Core\GatewayInterface')
         );
         $gateway->shouldReceive('execute')->once()->with(m::type('PayumTW\Mypay\Request\Api\CreateTransaction'));
-        $action->execute($request);
+        $this->assertNull($action->execute($request));
     }
 
     public function testCaptured()
@@ -47,6 +47,6 @@ class CaptureActionTest extends TestCase
             $gateway = m::mock('Payum\Core\GatewayInterface')
         );
         $gateway->shouldReceive('execute')->once()->with(m::type('Payum\Core\Request\Sync'));
-        $action->execute($request);
+        $this->assertNull($action->execute($request));
     }
 }

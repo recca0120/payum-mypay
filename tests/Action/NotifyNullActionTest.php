@@ -29,6 +29,6 @@ class NotifyNullActionTest extends TestCase
         });
         $gateway->shouldReceive('execute')->once()->with(m::type('Payum\Core\Request\GetToken'));
         $gateway->shouldReceive('execute')->once()->with(m::type('Payum\Core\Request\Notify'));
-        $action->execute($request);
+        $this->assertNull($action->execute($request));
     }
 }
