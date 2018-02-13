@@ -105,6 +105,8 @@ class Api
             'user_sn' => null,
             // 消費者家用電話(白天電話)
             'user_phone' => null,
+            // 行動電話國碼(預設886)​
+            'user_cellphone_code' => '886',
             // 消費者行動電話
             'user_cellphone' => null,
             // 消費者 E­Mail
@@ -113,6 +115,8 @@ class Api
             'user_birthday' => null,
             // 訂單總金額(如為定期定額付費，此為一期的金額) = 物品 之總價加總 ­ 折價  必要  必要
             'cost' => null,
+            // 預設交易幣別
+            'currency' => 'TWD',
             // 訂單編號(訂單編號建議不要重覆)  必要  必要
             'order_id' => null,
             // 消費者來源 IP  必要  必要
@@ -129,6 +133,8 @@ class Api
             'regular' => null,
             // 總期數(如為 12 期即代入 12，如果為不限期數，請代入  0，如非定期定額付費，不需傳此參數
             'regular_total' => null,
+            // 1.定期定額式付費編號 2.定期分期式付費編號
+            'group_id' => null,
             // 票券總產生張數
             'voucher_total_count' => null,
             // 物品總金額
@@ -147,6 +153,16 @@ class Api
             'limit_pay_days' => null,
             // 運費,
             'shipping_fee' => null,
+            // 啟用快速結帳
+            'enable_quickpay' => 1,
+            // 啟用電子錢包
+            'enable_ewallet' => 0,
+            // 消費者完成電子錢包卡號綁定後 ，直接使用本參數，系統會自動 從綁定卡號扣款 若使用本參數，pfn將自動限制為 信用卡與海外信用卡兩種交易(虛 擬卡號在消費者啟用電子錢包時 ，會背景告知相關資訊，
+            'virtual_pan' => null,
+            // 1.支付頁面模式，mypay顯示結果 (預設) 2.背景發動扣款(直接回傳交易回 報參數)
+            'ewallet_type' => 1,
+            // 定期扣款起扣日(若未指定日期， 或小於今日則將判為當日扣)
+            'regular_first_charge_date' => null,
         ];
 
         $supportedItemParams = ['id', 'name', 'cost', 'amount'];
@@ -208,6 +224,55 @@ class Api
 
         return $this->doRequest(
             $this->encrypter->encryptRequest($this->options['store_uid'], $params, 'api/queryorder')
+        );
+    }
+
+    /**
+     * refundTransaction.
+     *
+     * @param array $params
+     * @return array
+     */
+    public function refundTransaction(array $params)
+    {
+        $supportedParams = [
+            'store_uid' => $this->options['store_uid'],
+            'uid' => null,
+            'key' => null,
+            'cost' => null,
+        ];
+
+        $params = array_filter(array_replace(
+            $supportedParams,
+            array_intersect_key($params, $supportedParams)
+        ));
+
+        return $this->doRequest(
+            $this->encrypter->encryptRequest($this->options['store_uid'], $params, 'api/refund')
+        );
+    }
+
+    /**
+     * cancelTransaction.
+     *
+     * @param array $params
+     * @return array
+     */
+    public function cancelTransaction(array $params)
+    {
+        $supportedParams = [
+            'store_uid' => $this->options['store_uid'],
+            'uid' => null,
+            'key' => null,
+        ];
+
+        $params = array_filter(array_replace(
+            $supportedParams,
+            array_intersect_key($params, $supportedParams)
+        ));
+
+        return $this->doRequest(
+            $this->encrypter->encryptRequest($this->options['store_uid'], $params, 'api/refundcancel')
         );
     }
 

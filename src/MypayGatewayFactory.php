@@ -17,7 +17,9 @@ use Http\Adapter\Buzz\Client as HttpBuzzClient;
 use Http\Client\Socket\Client as HttpSocketClient;
 use Http\Adapter\Guzzle5\Client as HttpGuzzle5Client;
 use Http\Adapter\Guzzle6\Client as HttpGuzzle6Client;
+use PayumTW\Mypay\Action\Api\CancelTransactionAction;
 use PayumTW\Mypay\Action\Api\CreateTransactionAction;
+use PayumTW\Mypay\Action\Api\RefundTransactionAction;
 use PayumTW\Mypay\Action\Api\GetTransactionDataAction;
 
 class MypayGatewayFactory extends GatewayFactory
@@ -117,6 +119,8 @@ class MypayGatewayFactory extends GatewayFactory
             'payum.action.convert_payment' => new ConvertPaymentAction(),
 
             'payum.action.api.create_transaction' => new CreateTransactionAction(),
+            'payum.action.api.refund_transaction' => new RefundTransactionAction(),
+            'payum.action.api.cancel_transaction' => new CancelTransactionAction(),
             'payum.action.api.get_transaction_data' => new GetTransactionDataAction(),
         ]);
 
