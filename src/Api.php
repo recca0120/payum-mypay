@@ -147,7 +147,7 @@ class Api
             'success_returl' => null,
             // 交易失敗後的轉址(若動態網址可以使用此方式傳遞)
             'failure_returl' => null,
-            // 折價
+            // 折價(​數值帶負數​)
             'discount' => null,
             // 當pfn=CSTORECODE或 E_COLLECTION時，此為自訂有效使 用天數，否則以系統設定為預設有效天數
             'limit_pay_days' => null,
@@ -163,6 +163,14 @@ class Api
             'ewallet_type' => 1,
             // 定期扣款起扣日(若未指定日期， 或小於今日則將判為當日扣)
             'regular_first_charge_date' => null,
+            // 1網路交易(預設)/2實體交易
+            'transaction_type' => null,
+            // 國內信用卡分期限定顯示期數(且必須服務商與 支付頁面設定有支援)
+            'creditcard_installment' => null,
+            // 無卡支付商品名稱代碼
+            'cardless_code' => null,
+            // 1: 應稅 2:零稅率 3: 免稅
+            'invoice_ratetype' => null,
         ];
 
         $supportedItemParams = ['id', 'name', 'cost', 'amount'];
